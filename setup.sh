@@ -1,36 +1,26 @@
-#!/bin/bash
+#!/bin/sh
 
-# ------------ config -----------------
-# setup
-doSetup=true
+set -e
 
-# ------------ end config -----------------
+echo "You must be root to execute the script. Exiting."
 
+# update and upgrade
+echo "Update and upgrade"
+sleep 1
+sudo apt-get update -y ; sudo apt-get upgrade -y ; sudo apt autoremove -y
 
-if $doSetup ; then
+# install software
+echo "install packages"
+sleep 1
+sudo apt install nala -y
+sleep 1
+sudo nala install mc curl apt-transport-https ntp nano software-properties-common -y
 
- # update and upgrade
-    apt-get update
-    DEBIAN_FRONTEND=noninteractive apt-get -y upgrade
-	
-	#install software
-	
-	apt-get -y install nala mc curl apt-transport-https ntp
-	
-	
-	#set time
-	sleep 3
-	echo "Tijd naar Nederlands zetten";
-	timedatectl set-timezone "Europe/Amsterdam"
-	sleep 3
-	echo "Check...";
-	systemctl status ntpd  
-	sleep 3
-	timedatectl 
-	sleep 3
-	
-	
-	# nano + other apps for add-apt-repository cmd
-    # http://stackoverflow.com/a/16032073 - page deleted :(
-    apt-get -y install nano software-properties-common
-	
+# set time
+sleep 1
+echo "Tijd naar Nederlands zetten"
+timedatectl set-timezone "Europe/Amsterdam"
+sleep 1
+echo "Check..."
+systemctl status ntpd
+sleep 3
