@@ -23,4 +23,24 @@ timedatectl set-timezone "Europe/Amsterdam"
 sleep 1
 echo "Check..."
 systemctl status ntpd
-sleep 3
+sleep 1
+
+#set SSH
+echo "Set SHH..."
+sed -i 's/[#]*PermitRootLogin yes/PermitRootLogin prohibit-password/g' /etc/ssh/sshd_config
+sed -i -e '/^\(#\|\)Port 22/s/^.*$/Port 2367/' /etc/ssh/sshd_config
+sed -i -e '/^\(#\|\)PasswordAuthentication/s/^.*$/PasswordAuthentication no/' /etc/ssh/sshd_config
+sed -i -e '/^\(#\|\)MaxAuthTries/s/^.*$/MaxAuthTries 2/' /etc/ssh/sshd_config
+sed -i -e '/^\(#\|\)KbdInteractiveAuthentication/s/^.*$/KbdInteractiveAuthentication no/' /etc/ssh/sshd_config
+sed -i -e '/^\(#\|\)ChallengeResponseAuthentication/s/^.*$/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
+sed -i -e '/^\(#\|\)X11Forwarding/s/^.*$/X11Forwarding no/' /etc/ssh/sshd_config
+sed -i -e '/^\(#\|\)AuthorizedKeysFile/s/^.*$/AuthorizedKeysFile .ssh\/authorized_keys/' /etc/ssh/sshd_config
+sleep1
+echo "restart SSH"
+sleep 1
+sudo sshd -t
+
+sudo systemctl restart ssh
+
+echo "Ready installing SSH"
+sleep 1
