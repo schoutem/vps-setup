@@ -2,7 +2,7 @@
 
 set -e
 
-echo "You must be root to execute the script. Exiting."
+echo "Install and set VPS script."
 
 # update and upgrade
 echo "Update and upgrade"
