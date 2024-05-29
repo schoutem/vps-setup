@@ -2,34 +2,7 @@
 
 # Check root
 
-if [ "$(id -u)" != "0" ]; then
-	echo "You must be root to execute the script. Exiting."
-	exit 1
-fi
 
-# update and upgrade
-echo "Check system...."
-sleep 1
-case $(uname -m) in
-x86_64)
-	ARCH=amd64
-	;;
-amd64)
-	ARCH=amd64
-	;;
-aarch64)
-	ARCH=arm64
-	;;
-*)
-	echo "This script does not support \"$(uname -m)\" CPU architecture. Exiting."
-	exit 1
-	;;
-esac
-
-if [ "$(uname -s)" != "Linux" ]; then
-	echo "This script does not support \"$(uname -s)\" Operating System. Exiting."
-	exit 1
-fi
 
 sleep 1
 echo ""
