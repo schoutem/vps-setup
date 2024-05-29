@@ -2,5 +2,5 @@
 
 Install:
 ```
-curl -o-  https://raw.github.com/schoutem/vps-setup/master/setup.sh | bash
+curl -o https://raw.github.com/schoutem/vps-setup/master/setup.sh | bash
 ```
