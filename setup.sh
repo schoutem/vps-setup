@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Check root
-
-
-
 sleep 1
 echo ""
 echo "Ok here we go...."
@@ -11,7 +7,8 @@ echo "Ok here we go...."
 # update and upgrade
 echo "Update and upgrade"
 sleep 1
-sudo apt-get update -y ; sudo apt-get upgrade -y ; sudo apt autoremove -y
+sudo apt update -y
+sudo apt upgrade -y
 
 # install software
 echo ""
