@@ -1,6 +1,5 @@
 #!/bin/sh
 
-set -e
 # Check root
 
 if [ "$(id -u)" != "0" ]; then
