@@ -86,7 +86,7 @@ function confirm() {
 if confirm; then
     echo "Reboot system...."
 	sleep 1
-	reboot
+	sudo reboot
 else
     echo "Aborting the reboot..."
 fi
