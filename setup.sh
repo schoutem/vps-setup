@@ -141,7 +141,7 @@ sleep 1
 # Function reboot
 function confirm() {
     while true; do
-        read -p "Do you want to reboot system? (YES/NO/CANCEL) " yn
+        read -p "Do you want to reboot system? (YES/NO/CANCEL or y/n/c)" yn
         case $yn in
             [Yy]* ) return 0;;
             [Nn]* ) return 1;;
