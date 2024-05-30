@@ -37,7 +37,7 @@ if [ "$pm" = "nala" ] ; then
 	exit 0
 fi
 sleep 1
-sudo nala install mc curl apt-transport-https ntp nano software-properties-common -y
+sudo $pm install mc curl apt-transport-https ntp nano software-properties-common -y
 
 # set time
 sleep 1
