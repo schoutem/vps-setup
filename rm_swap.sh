@@ -20,6 +20,9 @@ if confirm; then
 	swapoff -a
 	rm -f /swapfile
     echo "Swap succesfully removed!"
+    # output results to terminal
+cat /proc/swaps
+cat /proc/meminfo | grep Swap
 else
     echo "Aborting the remove Swapfile.."
 fi
