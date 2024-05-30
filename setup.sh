@@ -1,5 +1,12 @@
 #!/bin/bash
 
+set -e
+
+if [ "$(id -u)" != "0" ]; then
+	echo "You must be root to execute the script. Exiting...."
+	exit 1
+fi
+
 #Specify settings
 echo "Which port do you want to use for SHH?"
 read -r selport
