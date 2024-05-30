@@ -3,9 +3,16 @@
 set -e
 
 if [ "$(id -u)" != "0" ]; then
-	echo "You must be root to execute the script. Exiting...."
+	echo -e "\033[31m You must be root to execute the script. Exiting....\033[0m"
 	exit 1
 fi
+
+ #Check swap excist
+ if [[ $(swapon -s | grep -ci "/dev" ) -gt 0 ]] ;
+ then echo -e "\033[32m No swapfile found, ok \033[0m" ;
+ else echo -e "\033[31m Swapfile excis remove the swap file first...\033[0m" ;
+ exit 1
+ fi
 
 #swapfile set
 # Get total available memory in bytes
