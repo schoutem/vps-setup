@@ -5,7 +5,7 @@ echo "Which port do you want to use for SHH?"
 read -r selport
 echo "Entered port: $selport"
 
-PS3="Choose your packet manager (NALA or APT): "
+PS3="Choose your packet manager (APT or NALA): "
 echo 
 select pm in "APT" "NALA"; do
   echo
@@ -18,7 +18,7 @@ read -r pm
 echo "Your settings are: port $selport and the chosen packetmanager $pm"
 
 sleep 2
-echo ""
+echo
 echo "Ok here we go...."
 
 # update and upgrade
@@ -28,7 +28,7 @@ sudo apt update -y
 sudo apt upgrade -y
 
 # install software
-echo ""
+echo
 echo "install packages"
 sleep 1
 sudo apt install nala -y
@@ -37,7 +37,7 @@ sudo nala install mc curl apt-transport-https ntp nano software-properties-commo
 
 # set time
 sleep 1
-echo ""
+echo
 echo "Tijd naar Nederlands zetten"
 timedatectl set-timezone "Europe/Amsterdam"
 sleep 1
@@ -57,12 +57,12 @@ sed -i -e '/^\(#\|\)ChallengeResponseAuthentication/s/^.*$/ChallengeResponseAuth
 sed -i -e '/^\(#\|\)X11Forwarding/s/^.*$/X11Forwarding no/' /etc/ssh/sshd_config
 sed -i -e '/^\(#\|\)AuthorizedKeysFile/s/^.*$/AuthorizedKeysFile .ssh\/authorized_keys/' /etc/ssh/sshd_config
 sleep 1
-echo ""
-echo "Restart SSH and set port to $selport"
+echo
+echo "Restart SSH..."
 sleep 1
 sudo sshd -t
 
 sudo systemctl restart ssh
-echo ""
-echo "Ready installing SSH"
+echo
+echo "Ready installing, SHH port is set to $selport and choosen packetmanager is $pm"
 sleep 1
