@@ -7,13 +7,13 @@ echo "Entered port: $selport"
 
 PS3="Choose your packet manager (APT or NALA): "
 echo 
-select pm in "APT" "NALA"; do
+select pm in "apt" "nala"; do
   echo
   echo "Choosen manager ${pm}"
   echo
   break
 done
-read -r pm
+read -p pm
 
 echo "Your settings are: port $selport and the chosen packetmanager $pm"
 
