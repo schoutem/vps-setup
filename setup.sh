@@ -31,7 +31,11 @@ sudo apt upgrade -y
 echo
 echo "install packages"
 sleep 1
-sudo apt install nala -y
+if [ "$pm" = "nala" ] ; then
+	echo "Installing nala...."
+	sudo apt install nala -y
+	exit 0
+fi
 sleep 1
 sudo nala install mc curl apt-transport-https ntp nano software-properties-common -y
 
