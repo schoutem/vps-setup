@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#Specify settings
+echo "Which port do you want to use for SHH?"
+read selport
+echo "Entered port: $selport"
+
+
+
 sleep 1
 echo ""
 echo "Ok here we go...."
