@@ -2,7 +2,7 @@
 
 #Specify settings
 echo "Which port do you want to use for SHH?"
-read selport
+read -r selport
 echo "Entered port: $selport"
 
 
@@ -39,7 +39,7 @@ sleep 1
 #set SSH
 echo "Set SHH..."
 sed -i 's/[#]*PermitRootLogin yes/PermitRootLogin prohibit-password/g' /etc/ssh/sshd_config
-sed -i -e '/^\(#\|\)Port 22/s/^.*$/Port 2367/' /etc/ssh/sshd_config
+sed -i -e '/^\(#\|\)Port 22/s/^.*$/Port '$selport'/' /etc/ssh/sshd_config
 sed -i -e '/^\(#\|\)PasswordAuthentication/s/^.*$/PasswordAuthentication no/' /etc/ssh/sshd_config
 sed -i -e '/^\(#\|\)MaxAuthTries/s/^.*$/MaxAuthTries 2/' /etc/ssh/sshd_config
 sed -i -e '/^\(#\|\)KbdInteractiveAuthentication/s/^.*$/KbdInteractiveAuthentication no/' /etc/ssh/sshd_config
@@ -48,7 +48,7 @@ sed -i -e '/^\(#\|\)X11Forwarding/s/^.*$/X11Forwarding no/' /etc/ssh/sshd_config
 sed -i -e '/^\(#\|\)AuthorizedKeysFile/s/^.*$/AuthorizedKeysFile .ssh\/authorized_keys/' /etc/ssh/sshd_config
 sleep 1
 echo ""
-echo "restart SSH"
+echo "Restart SSH and set port to $selport"
 sleep 1
 sudo sshd -t
 
