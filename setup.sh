@@ -7,46 +7,7 @@ if [ "$(id -u)" != "0" ]; then
 	exit 1
 fi
 
-#Specify settings
-echo "Which port do you want to use for SHH?"
-read -r selport
-echo "Entered port: $selport"
-
-PS3="Choose your packet manager (APT or NALA): "
-echo 
-select pm in "apt" "nala"; do
-  echo
-  echo "Choosen manager ${pm}"
-  echo
-  break
-done
-read -p pm
-
-echo "Your settings are: port $selport and the chosen packetmanager $pm"
-
-sleep 2
-echo
-echo "Ok here we go...."
-
-# update and upgrade
-echo "Update and upgrade"
-sleep 1
-sudo apt update -y
-sudo apt upgrade -y
-
-# install software
-echo
-echo "install packages"
-sleep 1
-if [ "$pm" = "nala" ] ; then
-	echo "Installing nala...."
-	sudo apt install nala -y
-fi
-sleep 1
-sudo $pm install mc curl apt-transport-https ntp nano software-properties-common -y
-
 #swapfile set
-
 # Get total available memory in bytes
 total_memory=$(grep MemTotal /proc/meminfo | awk '{print $2 * 1024}')
  
@@ -99,8 +60,51 @@ case $choice in
     exit 1
     ;;
 esac
- 
+#End setting swapfile
+
+#Specify settings
+echo "Which port do you want to use for SHH?"
+read -r selport
+echo "Entered port: $selport"
+
+PS3="Choose your packet manager (APT or NALA): "
+echo 
+select pm in "apt" "nala"; do
+  echo
+  echo "Choosen manager ${pm}"
+  echo
+  break
+done
+read -p pm
+
+echo "Your settings are: port $selport and the chosen packetmanager $pm"
+
+sleep 2
+echo
+echo "Ok here we go...."
+
+# update and upgrade
+echo "Update and upgrade"
+sleep 1
+sudo apt update -y
+sudo apt upgrade -y
+
+# install software
+echo
+echo "install packages"
+sleep 1
+if [ "$pm" = "nala" ] ; then
+	echo "Installing nala...."
+	sudo apt install nala -y
+fi
+sleep 1
+sudo $pm install mc curl apt-transport-https ntp nano software-properties-common -y
+
+#Create swapfile
+echo "Create swapfile"
 create_swap "$swap_size"
+sleep 1
+echo "Done..."
 
 # set time
 sleep 1
