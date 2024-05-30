@@ -5,18 +5,15 @@ echo "Which port do you want to use for SHH?"
 read -r selport
 echo "Entered port: $selport"
 
-read -r "Please enter your packet manager (NALA or APT)? " pm
-
-case "$pm" in
-	"apt")
-		echo "default packet manager"
-	;;
-	"nala")
-		echo "a free, open source alternative front-end to APT"
-	;;
-	*)
-	;;
-esac
+PS3="Choose your packet manager (NALA or APT): "
+echo 
+select pm in "APT" "NALA"; do
+  echo
+  echo "Choosen manager ${pm}"
+  echo
+  break
+done
+read -r pm
 
 echo "Your settings are: port $selport and the chosen packetmanager $pm"
 
