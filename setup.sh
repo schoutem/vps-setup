@@ -45,6 +45,63 @@ fi
 sleep 1
 sudo $pm install mc curl apt-transport-https ntp nano software-properties-common -y
 
+#swapfile set
+
+# Get total available memory in bytes
+total_memory=$(grep MemTotal /proc/meminfo | awk '{print $2 * 1024}')
+ 
+# Function to create and enable swap file
+create_swap() {
+  local size=$1
+  local swapfile="/swapfile"
+ 
+  # Create swap file with the specified size
+  sudo fallocate -l "$size" "$swapfile"
+ 
+  # Set permissions
+  sudo chmod 600 "$swapfile"
+ 
+  # Make it a swap file
+  sudo mkswap "$swapfile"
+ 
+  # Enable swap
+  sudo swapon "$swapfile"
+ 
+  # Add swap file to /etc/fstab for auto-mount
+  echo "$swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+ 
+  echo "Swap file created and enabled successfully."
+}
+ 
+echo "Choose an option:"
+echo "1. Double the system memory"
+echo "2. Set custom size (in GB)"
+echo "3. Exit"
+ 
+read -p "Enter your choice (1/2/3): " choice
+ 
+case $choice in
+  1)
+    # Double the system memory
+    swap_size=$((total_memory * 2))
+    ;;
+  2)
+    read -p "Enter custom size in **GB**: " custom_size
+    # Convert to bytes
+    swap_size=$((custom_size * 1024 * 1024 * 1024))
+    ;;
+  3)
+    echo "Exiting..."
+    exit 0
+    ;;
+  *)
+    echo "Invalid option, exiting..."
+    exit 1
+    ;;
+esac
+ 
+create_swap "$swap_size"
+
 # set time
 sleep 1
 echo
