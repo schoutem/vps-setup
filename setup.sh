@@ -5,7 +5,7 @@ echo "Which port do you want to use for SHH?"
 read -r selport
 echo "Entered port: $selport"
 
-read -p "Please enter your packet manager (NALA or APT)? " pm
+read -r "Please enter your packet manager (NALA or APT)? " pm
 
 case "$pm" in
 	"apt")
@@ -18,7 +18,9 @@ case "$pm" in
 	;;
 esac
 
-sleep 1
+echo "Your settings are: port $selport and the chosen packetmanager $pm"
+
+sleep 2
 echo ""
 echo "Ok here we go...."
 
