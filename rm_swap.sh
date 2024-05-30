@@ -19,6 +19,7 @@ if confirm; then
 	echo "3" > /proc/sys/vm/drop_caches
 	swapoff -a
 	rm -f /swapfile
+    echo "Swap succesfully removed!"
 else
     echo "Aborting the remove Swapfile.."
 fi
