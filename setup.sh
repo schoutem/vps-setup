@@ -34,7 +34,6 @@ sleep 1
 if [ "$pm" = "nala" ] ; then
 	echo "Installing nala...."
 	sudo apt install nala -y
-	exit 0
 fi
 sleep 1
 sudo $pm install mc curl apt-transport-https ntp nano software-properties-common -y
@@ -70,3 +69,24 @@ sudo systemctl restart ssh
 echo
 echo "Ready installing, SHH port is set to $selport and choosen packetmanager is $pm"
 sleep 1
+
+# Function reboot
+function confirm() {
+    while true; do
+        read -p "Do you want to reboot system? (YES/NO/CANCEL) " yn
+        case $yn in
+            [Yy]* ) return 0;;
+            [Nn]* ) return 1;;
+            [Cc]* ) exit;;
+            * ) echo "Please answer YES, NO, or CANCEL.";;
+        esac
+    done
+}
+
+if confirm; then
+    echo "Reboot system...."
+	sleep 1
+	reboot
+else
+    echo "Aborting the reboot..."
+fi
