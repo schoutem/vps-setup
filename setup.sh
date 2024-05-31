@@ -8,13 +8,17 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
  #Check swap excist
- if [[ $(swapon -s | grep -ci "/dev" ) -gt 0 ]] ;
- then echo -e "\033[32m No swapfile found, ok \033[0m" ;
- else echo -e "\033[31m Swapfile excis remove the swap file first...\033[0m" ;
- echo "Get script: wget https://raw.github.com/schoutem/vps-setup/master/rm_swap.sh";
- read -p "Press enter to continue"
+grep -q "swapfile" /etc/fstab
+
+# if not then create it
+if [ $? -ne 0 ]; then
+        echo -e "\033[32m No swapfile found, ok \033[0m" ;
+else
+        echo -e "\033[31m Swapfile excis remove the swap file first...\033[0m" ;
+		echo "Get script: wget https://raw.github.com/schoutem/vps-setup/master/rm_swap.sh";
+		read -p "Press enter to continue"
  exit 1
- fi
+fi
 
 #swapfile set
 # Get total available memory in bytes
