@@ -13,6 +13,10 @@ grep -q "swapfile" /etc/fstab
 # if not then create it
 if [ $? -ne 0 ]; then
         echo -e "\033[32m No swapfile found, ok \033[0m" ;
+	echo
+	# output results to terminal
+	cat /proc/swaps
+	cat /proc/meminfo | grep Swap
 else
         echo -e "\033[31m Swapfile excis remove the swap file first...\033[0m" ;
 		echo "Get remove swapfile script: wget https://raw.github.com/schoutem/vps-setup/master/rm_swap.sh";
@@ -118,6 +122,10 @@ echo "Create swapfile"
 create_swap "$swap_size"
 sleep 1
 echo "Done..."
+echo
+# output results to terminal
+cat /proc/swaps
+cat /proc/meminfo | grep Swap
 
 # set time
 sleep 1
