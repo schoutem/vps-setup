@@ -12,6 +12,7 @@ grep -q "swapfile" /etc/fstab
 
 # if not then create it
 if [ $? -ne 0 ]; then
+  echo
         echo -e "\033[32m No swapfile found, ok \033[0m" ;
 	echo
 
@@ -74,7 +75,9 @@ esac
 	cat /proc/swaps
 	cat /proc/meminfo | grep Swap
 else
+        echo
         echo -e "\033[31m Swapfile excis remove the swap file first...\033[0m" ;
+        echo
 		
    # Function remove swap
 function confirm() {
@@ -159,10 +162,36 @@ cat /proc/swaps
 cat /proc/meminfo | grep Swap
 #End create swapfile
 
+#Set swapiness
+var=$(cat /proc/sys/vm/swappiness)
+
+grep -q "60" /proc/sys/vm/swappiness
+
+# if not then create it
+if [ $? -ne 0 ]; then
+        echo
+        echo -e "\033[32m Swapiness settings are $var (not set to default), ok \033[0m" ;
+	      echo 
+        sleep 1
+        echo -e "\033[32m no changes necessary\033[0m" ;
+        echo
+else
+        echo
+        echo -e "\033[31m Chance Swapiness to 20... \033[0m" ;
+        echo
+        sed -i -e '$a\'$'\n''vm.swappiness = 20' /etc/sysctl.conf
+        swapoff -a
+        echo "Wait 30 sec..."
+        sleep 30
+        swapon -a
+        echo -e "\033[32m Swapiness settings are set .... \033[0m" ;
+        echo
+fi
+
 # set time
 sleep 1
 echo
-echo "Tijd naar Nederlands zetten"
+echo "Convert time to Dutch.."
 timedatectl set-timezone "Europe/Amsterdam"
 sleep 1
 echo ""
