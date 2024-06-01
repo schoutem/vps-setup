@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 if [ "$(id -u)" != "0" ]; then
 	echo -e "\033[31m You must be root to execute the script. Exiting....\033[0m"
 	exit 1
