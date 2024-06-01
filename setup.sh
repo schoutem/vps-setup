@@ -7,29 +7,22 @@ if [ "$(id -u)" != "0" ]; then
 	exit 1
 fi
 
- #Check swap excist
+#Swapfile
+
+#Check swap excist
 grep -q "swapfile" /etc/fstab
 
 # if not then create it
 if [ $? -ne 0 ]; then
         echo -e "\033[32m No swapfile found, ok \033[0m" ;
 	echo
-	# output results to terminal
-	cat /proc/swaps
-	cat /proc/meminfo | grep Swap
-else
-        echo -e "\033[31m Swapfile excis remove the swap file first...\033[0m" ;
-		echo "Get remove swapfile script: wget https://raw.github.com/schoutem/vps-setup/master/rm_swap.sh";
-		read -p "Press enter to continue"
- exit 1
-fi
 
 #swapfile set
 # Get total available memory in bytes
 total_memory=$(grep MemTotal /proc/meminfo | awk '{print $2 * 1024}')
  
 # Function to create and enable swap file
-create_swap() {
+  create_swap() {
   local size=$1
   local swapfile="/swapfile"
  
@@ -78,6 +71,46 @@ case $choice in
     ;;
 esac
 #End setting swapfile
+ 
+	# output results to terminal
+	cat /proc/swaps
+	cat /proc/meminfo | grep Swap
+else
+        echo -e "\033[31m Swapfile excis remove the swap file first...\033[0m" ;
+		
+   # Function remove swap
+function confirm() {
+    while true; do
+        read -p "Do you want to remove Swapfile? (YES/NO/CANCEL or y/n/c)" yn
+        case $yn in
+            [Yy]* ) return 0;;
+            [Nn]* ) return 1;;
+            [Cc]* ) exit;;
+            * ) echo "Please answer YES, NO, or CANCEL.";;
+        esac
+    done
+}
+
+if confirm; then
+    echo "Remove swapfile...."
+	sleep 1
+	sed -i '/swapfile/d' /etc/fstab
+	echo "3" > /proc/sys/vm/drop_caches
+	swapoff -a
+	rm -f /swapfile
+    echo "Swap succesfully removed!"
+    # output results to terminal
+cat /proc/swaps
+cat /proc/meminfo | grep Swap
+else
+    echo "Aborting the remove Swapfile.."
+fi
+   
+		read -p "Press enter to continue"
+ exit 1
+fi
+
+#End Swapfile
 
 #Specify settings
 echo "Which port do you want to use for SHH?"
@@ -126,6 +159,7 @@ echo
 # output results to terminal
 cat /proc/swaps
 cat /proc/meminfo | grep Swap
+#End create swapfile
 
 # set time
 sleep 1
