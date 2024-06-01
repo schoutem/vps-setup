@@ -193,6 +193,60 @@ echo
 echo "Ready installing, SHH port is set to $selport and choosen packetmanager is $pm"
 sleep 1
 
+echo
+sleep 1
+echo "Setting auto updates..."
+echo
+
+#auto updates
+sudo apt install unattended-upgrades -y && sudo apt install update-notifier-common -y
+
+#50auto-upgrades
+sed -i 's/\/\/	 "${distro_id}:${distro_codename}";/	 "${distro_id}:${distro_codename}";/g' /etc/apt/apt.conf.d/50unattended-upgrades
+sed -i 's/\/\/	 "${distro_id}:${distro_codename}-security";/	 "${distro_id}:${distro_codename}-security";/g' /etc/apt/apt.conf.d/50unattended-upgrades
+
+sed -i 's/\/\/Unattended-Upgrade::AutoFixInterruptedDpkg "true";/Unattended-Upgrade::AutoFixInterruptedDpkg "true";/g' /etc/apt/apt.conf.d/50unattended-upgrades
+sed -i 's/\/\/Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";/Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";/g' /etc/apt/apt.conf.d/50unattended-upgrades
+sed -i 's/\/\/Unattended-Upgrade::Remove-New-Unused-Dependencies "true";/Unattended-Upgrade::Remove-New-Unused-Dependencies "true";/g' /etc/apt/apt.conf.d/50unattended-upgrades
+sed -i 's/\/\/Unattended-Upgrade::Remove-Unused-Dependencies "false";/Unattended-Upgrade::Remove-Unused-Dependencies "true";/g' /etc/apt/apt.conf.d/50unattended-upgrades
+sed -i 's/\/\/Unattended-Upgrade::Remove-New-Unused-Dependencies "true";/Unattended-Upgrade::Remove-New-Unused-Dependencies "true";/g' /etc/apt/apt.conf.d/50unattended-upgrades
+sed -i 's/\/\/Unattended-Upgrade::Automatic-Reboot "false";/Unattended-Upgrade::Automatic-Reboot "true";/g' /etc/apt/apt.conf.d/50unattended-upgrades
+sed -i 's/\/\/Unattended-Upgrade::Automatic-Reboot-Time "02:00";/Unattended-Upgrade::Automatic-Reboot-Time "03:00";/g' /etc/apt/apt.conf.d/50unattended-upgrades
+
+#20auto-upgrades
+sed -i -e '$a\'$'\n''APT::Periodic::AutocleanInterval "7";' /etc/apt/apt.conf.d/20auto-upgrades
+sed -i 's/\/\/APT::Periodic::Update-Package-Lists "0";/APT::Periodic::Update-Package-Lists "1";/g' /etc/apt/apt.conf.d/20auto-upgrades
+sed -i 's/\/\/APT::Periodic::Unattended-Upgrade "0";/APT::Periodic::Unattended-Upgrade "1";/g' /etc/apt/apt.conf.d/20auto-upgrades
+
+sleep 1
+echo
+echo -e "\033[31m Now we are going reconfigue, next step click Enter for Yes.\033[0m"
+echo
+sleep 1
+read -p "Press enter to begin reconfigure..."
+sudo dpkg-reconfigure -plow unattended-upgrades
+
+sleep 1
+echo
+echo "service unattended restart..."
+sudo systemctl restart unattended-upgrades.service
+sleep 1
+
+#status Unatended
+systemctl status unattended-upgrades
+
+sleep 1
+echo
+echo "Test it Out with a Dry Run..."
+echo
+sudo unattended-upgrades --dry-run --debug
+
+echo
+echo "Ready install unattended-upgrades.."
+echo
+
+#End auto updates
+
 # Function reboot
 function confirm() {
     while true; do
