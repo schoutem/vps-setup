@@ -180,10 +180,8 @@ else
         echo -e "\033[31m Chance Swapiness to 20... \033[0m" ;
         echo
         sed -i -e '$a\'$'\n''vm.swappiness = 20' /etc/sysctl.conf
-        swapoff -a
-        echo "Wait 30 sec..."
-        sleep 30
-        swapon -a
+        sudo sysctl -p
+        sleep 2
         echo -e "\033[32m Swapiness settings are set .... \033[0m" ;
         echo
 fi
