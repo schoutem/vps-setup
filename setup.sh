@@ -1,7 +1,12 @@
 #!/bin/bash
 
+RED="\e[31m"
+GREEN="\e[32m"
+BLUE="\e[34m"
+ENDCOLOR="\e[0m"
+
 if [ "$(id -u)" != "0" ]; then
-	echo -e "\033[31m You must be root to execute the script. Exiting....\033[0m"
+	echo -e "${RED}You must be root to execute the script. Exiting....${ENDCOLOR}"
 	exit 1
 fi
 
@@ -13,7 +18,7 @@ grep -q "swapfile" /etc/fstab
 # if not then create it
 if [ $? -ne 0 ]; then
   echo
-        echo -e "\033[32m No swapfile found, ok \033[0m" ;
+        echo -e "${GREEN}No swapfile found, ok${ENDCOLOR}" ;
 	echo
 
 #swapfile set
@@ -76,10 +81,10 @@ esac
 	cat /proc/meminfo | grep Swap
 else
         echo
-        echo -e "\033[31m Swapfile excis remove the swap file first...\033[0m" ;
+        echo -e "${RED}Swapfile excis remove the swap file first...${ENDCOLOR}" ;
         echo
 		
-   # Function remove swap
+# Function remove swap
 function confirm() {
     while true; do
         read -p "Do you want to remove Swapfile? (YES/NO/CANCEL or y/n/c)" yn
@@ -108,10 +113,12 @@ else
 fi
    
 		read -p "Press enter to continue"
- exit 1
+ exec bash
 fi
 
 #End Swapfile
+
+
 
 #Specify settings
 echo "Which port do you want to use for SHH?"
@@ -126,13 +133,17 @@ select pm in "apt" "nala"; do
   echo
   break
 done
-read -p pm
+#read -p pm
 
 echo "Your settings are: port $selport and the chosen packetmanager $pm"
 
 sleep 2
 echo
 echo "Ok here we go...."
+
+#Start set and install
+
+##############################################################################################
 
 # update and upgrade
 echo "Update and upgrade"
@@ -163,28 +174,90 @@ cat /proc/meminfo | grep Swap
 #End create swapfile
 
 #Set swapiness
-var=$(cat /proc/sys/vm/swappiness)
-
-grep -q "60" /proc/sys/vm/swappiness
+function swness() {
 
 # if not then create it
 if [ $? -ne 0 ]; then
         echo
-        echo -e "\033[32m Swapiness settings are $var (not set to default), ok \033[0m" ;
+        echo -e "${GREEN}Swapiness settings are $var (not set to default), ok${ENDCOLOR}" ;
 	      echo 
         sleep 1
-        echo -e "\033[32m no changes necessary\033[0m" ;
+        echo -e "${GREEN}No changes necessary${ENDCOLOR}" ;
         echo
 else
+
+echo "Choose an option:"
+echo "1. Set Swapiness to 10"
+echo "2. Set custom size (10-40)"
+echo "3. Exit"
+ 
+read -p "Enter your choice (1/2/3): " choice
+
+case $choice in
+  1)
+    # Double the system memory
+    swap_size=10
+    ;;
+  2)
+    read -p "Enter custom size in (10-40): " swap_size
+    ;;
+  3)
+    echo "Exiting..."
+    exit 0
+    ;;
+  *)
+    echo "Invalid option, exiting..."
+    exit 1
+    ;;
+esac
+
         echo
-        echo -e "\033[31m Chance Swapiness to 20... \033[0m" ;
+        echo -e "${BLUE}Chance Swapiness to $swap_size...${ENDCOLOR}" ;
         echo
-        sed -i -e '$a\'$'\n''vm.swappiness = 20' /etc/sysctl.conf
-        sudo sysctl -p
+        sed -i -e '$a\'$'\n''vm.swappiness = '$swap_size'' /etc/sysctl.conf
+        echo   
+        sudo sysctl -p    
         sleep 2
-        echo -e "\033[32m Swapiness settings are set .... \033[0m" ;
+        echo -e "${GREEN}Swapiness settings are set to $swap_size....${ENDCOLOR}" ;
         echo
+
 fi
+
+}
+#END Set swapiness
+
+#Remove swapiness
+ 
+function rmswness() {
+read -p "Press enter to continue"
+varsw=$(cat /proc/sys/vm/swappiness)
+      read -p $'\033[1;32mPress enter to continue to remove custom swapiness'$'\e[0m'     
+      echo
+      echo -e "${BLUE}Removing Swapiness $varsw...${ENDCOLOR}" ;
+      echo
+      sed -i 's/vm.swappiness = '$varsw'/ /g' /etc/sysctl.conf
+      sudo sysctl -p  
+      sleep 2
+      echo
+      echo "Removed"
+      }
+
+
+#END Remove swapiness
+
+#check Swapiness excist
+if [ $(grep -ic "60" /proc/sys/vm/swappiness) -eq 1 ]; then
+    echo -e "${RED}We have found custom swap.${ENDCOLOR}"
+    rmswness
+elif [ $(grep -ic "vm.swappiness" /etc/sysctl.conf) -eq 1 ]; then
+    echo -e "${RED}We have found custom swap in /etc/sysctl.conf.${ENDCOLOR}"
+    rmswness
+else
+    echo -e "${GREEN}We haven't found custom swapiness.${ENDCOLOR}"
+    swness
+fi
+#END check Swapiness excist
+
 
 # set time
 sleep 1
@@ -245,7 +318,7 @@ sed -i 's/\/\/APT::Periodic::Unattended-Upgrade "0";/APT::Periodic::Unattended-U
 
 sleep 1
 echo
-echo -e "\033[31m Now we are going reconfigue, next step click Enter for Yes.\033[0m"
+echo -e "${BLUE}Now we are going reconfigue unattended service, next step click Enter for Yes.${ENDCOLOR"
 echo
 sleep 1
 read -p "Press enter to begin reconfigure..."
