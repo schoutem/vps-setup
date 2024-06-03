@@ -313,7 +313,9 @@ timedatectl set-timezone "Europe/Amsterdam"
 sleep 1
 echo ""
 echo "Check..."
-systemctl status ntpd
+sudo systemctl start ntp
+
+sudo systemctl status ntpd
 sleep 1
 
 #set SSH
