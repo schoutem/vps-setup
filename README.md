@@ -1,6 +1,6 @@
 # vps-setup
 
-<img src-"setup.PNG">
+<img src="setup.PNG">
 
 Install:
 ```
