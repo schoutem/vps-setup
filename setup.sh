@@ -5,10 +5,56 @@ GREEN="\e[32m"
 BLUE="\e[34m"
 ENDCOLOR="\e[0m"
 
+check_root() {
+echo "Check root..."
+sleep 2
 if [ "$(id -u)" != "0" ]; then
+  echo
 	echo -e "${RED}You must be root to execute the script. Exiting....${ENDCOLOR}"
 	exit 1
+ else
+ echo
+ 	echo -e "${GREEN}Yes you are root....${ENDCOLOR}"
+  echo
 fi
+}
+
+check_os(){
+. /etc/os-release
+echo "Check system..."
+echo
+sleep 2
+if [ $ID == 'ubuntu' ]; then
+echo
+echo "OS Ubuntu, ok"
+echo
+lsb_release -a
+else
+echo
+echo "This script works best on Ubuntu OS"
+exit 1
+fi
+}
+
+##################################################################################################
+
+echo -e "
+__      _______   _____    _____      _               
+\ \    / /  __ \ / ____|  / ____|    | |              
+ \ \  / /| |__) | (___   | (___   ___| |_ _   _ _ __  
+  \ \/ / |  ___/ \___ \   \___ \ / _ \ __| | | | '_ \ 
+   \  /  | |     ____) |  ____) |  __/ |_| |_| | |_) |
+    \/   |_|    |_____/  |_____/ \___|\__|\__,_| .__/ 
+                                               | |    
+                                               |_|    
+" 
+
+check_root
+sleep 2
+check_os
+
+##################################################################################################            
+
 
 #Swapfile
 
