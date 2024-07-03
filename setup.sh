@@ -304,7 +304,6 @@ else
 fi
 #END check Swapiness excist
 
-
 # set time
 sleep 1
 echo
@@ -405,11 +404,10 @@ function confirm() {
         esac
     done
 }
-
 if confirm; then
-    echo "Reboot system...."
+    echo -e "${GREEN} Reboot system....${ENDCOLOR}" ;
 	sleep 1
 	sudo reboot
 else
-    echo "Aborting the reboot..."
+   echo -e "${RED}Aborting the reboot...${ENDCOLOR}" ;
 fi
