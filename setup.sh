@@ -335,7 +335,7 @@ sed -i 's/\/\/APT::Periodic::Unattended-Upgrade "0";/APT::Periodic::Unattended-U
 
 sleep 1
 echo
-echo -e "${BLUE}Now we are going reconfigue unattended service, next step click Enter for Yes.${ENDCOLOR"
+echo -e "${BLUE}Now we are going reconfigue unattended service, next step click Enter for Yes.${ENDCOLOR}"
 echo
 sleep 1
 read -p "Press enter to begin reconfigure..."
