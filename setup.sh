@@ -392,7 +392,7 @@ function confirm() {
 }
 
 if confirm; then
-    echo -e "${GREEN} Reboot system....${ENDCOLOR}"
+    echo -e "${GREEN}Reboot system....${ENDCOLOR}"
 	sleep 1
 	sudo reboot
 else
