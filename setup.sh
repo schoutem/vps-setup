@@ -5,6 +5,26 @@ GREEN="\e[32m"
 BLUE="\e[34m"
 ENDCOLOR="\e[0m"
 
+# Function to display the progress bar
+progress_bar() {
+  local duration=${1}
+    
+  already_done() { for ((done=0; done<$1; done++)); do printf "#"; done }
+  remaining() { for ((remain=$1; remain<$duration; remain++)); do printf " "; done }
+  percentage() { printf "| %s%%" $(( (($1)*100)/($duration)*100/100 )); }
+  clean_line() { printf "\r"; }
+ 
+  for (( current_duration=1; current_duration<=$duration; current_duration++ )); do
+    already_done $current_duration
+    remaining $current_duration
+    percentage $current_duration
+    clean_line
+    sleep 1
+  done
+ 
+  clean_line
+}
+
 check_root() {
 echo "Check root..."
 sleep 2
@@ -393,7 +413,7 @@ function confirm() {
 
 if confirm; then
     echo -e "${GREEN}Reboot system....${ENDCOLOR}"
-	sleep 1
+	progress_bar 5
 	sudo reboot
 else
    echo -e "${RED}Aborting the reboot...${ENDCOLOR}"
