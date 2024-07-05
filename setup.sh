@@ -287,8 +287,10 @@ timedatectl set-timezone "Europe/Amsterdam"
 sleep 1
 echo ""
 echo "Check..."
-sudo systemctl start ntp
-
+sudo systemctl restart ntp
+sleep 1
+echo ""
+echo "Status NTP Check..."
 sudo systemctl status ntpd
 sleep 1
 
@@ -367,7 +369,7 @@ echo
 
 #End auto updates
 
-# Function reboot
+#Function reboot
 function confirm() {
     while true; do
         read -p "Do you want to reboot system? (YES/NO/CANCEL or y/n/c)" yn
