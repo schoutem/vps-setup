@@ -165,6 +165,22 @@ fi
 sleep 1
 sudo $pm install mc curl apt-transport-https nano software-properties-common -y
 
+#Set Nano settings
+sleep 1
+echo
+echo "Set Nano config..."
+echo
+sed -i 's/[# ]*set tabsize 8/set tabsize 4/g' /etc/nanorc
+sed -i -e '/^\(#\|\) set constantshow/s/^.*$/set constantshow/' /etc/nanorc
+sed -i -e '/^\(#\|\) set linenumbers/s/^.*$/set linenumbers/' /etc/nanorc
+sed -i -e '/^\(#\|\) set mouse/s/^.*$/set mouse/' /etc/nanorc
+
+sleep 1
+echo
+echo "Set Nano config done..."
+echo
+#End set Nano settings
+
 #Create swapfile
 echo "Create swapfile"
 create_swap "$swap_size"
