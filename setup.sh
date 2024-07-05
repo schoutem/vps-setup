@@ -66,6 +66,7 @@ if [ $? -ne 0 ]; then
   echo
         echo -e "${GREEN}No swapfile found, ok${ENDCOLOR}" ;
 	echo
+fi
 
 #swapfile set
 # Get total available memory in bytes
