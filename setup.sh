@@ -359,7 +359,6 @@ sudo unattended-upgrades --dry-run --debug
 echo
 echo "Ready install unattended-upgrades.."
 echo
-
 #End auto updates
 
 #Function reboot
@@ -374,10 +373,11 @@ function confirm() {
         esac
     done
 }
+
 if confirm; then
-    echo -e "${GREEN} Reboot system....${ENDCOLOR}" ;
+    echo -e "${GREEN} Reboot system....${ENDCOLOR}"
 	sleep 1
 	sudo reboot
 else
-   echo -e "${RED}Aborting the reboot...${ENDCOLOR}" ;
+   echo -e "${RED}Aborting the reboot...${ENDCOLOR}"
 fi
