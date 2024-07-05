@@ -170,6 +170,7 @@ sleep 1
 echo
 echo "Set Nano config..."
 echo
+
 sed -i 's/[# ]*set tabsize 8/set tabsize 4/g' /etc/nanorc
 sed -i -e '/^\(#\|\) set constantshow/s/^.*$/set constantshow/' /etc/nanorc
 sed -i -e '/^\(#\|\) set linenumbers/s/^.*$/set linenumbers/' /etc/nanorc
