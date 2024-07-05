@@ -122,15 +122,7 @@ case $choice in
     ;;
 esac
 #End setting swapfile
- 
-	# output results to terminal
-	cat /proc/swaps
-	cat /proc/meminfo | grep Swap
-else
-        echo
-        echo -e "${RED}Swapfile excis remove the swap file first...${ENDCOLOR}" ;
-        echo
-		
+ 	
 #Specify settings
 echo "Which port do you want to use for SHH?"
 read -r selport
