@@ -413,6 +413,7 @@ function confirm() {
 
 if confirm; then
     echo -e "${GREEN}Reboot system....${ENDCOLOR}"
+    echo
 	progress_bar 5
 	sudo reboot
 else
