@@ -130,42 +130,6 @@ else
         echo -e "${RED}Swapfile excis remove the swap file first...${ENDCOLOR}" ;
         echo
 		
-# Function remove swap
-function confirm() {
-    while true; do
-        read -p "Do you want to remove Swapfile? (YES/NO/CANCEL or y/n/c)" yn
-        case $yn in
-            [Yy]* ) return 0;;
-            [Nn]* ) return 1;;
-            [Cc]* ) exit;;
-            * ) echo "Please answer YES, NO, or CANCEL.";;
-        esac
-    done
-}
-
-if confirm; then
-    echo "Remove swapfile...."
-	sleep 1
-	sed -i '/swapfile/d' /etc/fstab
-	echo "3" > /proc/sys/vm/drop_caches
-	swapoff -a
-	rm -f /swapfile
-    echo "Swap succesfully removed!"
-    # output results to terminal
-cat /proc/swaps
-cat /proc/meminfo | grep Swap
-else
-    echo "Aborting the remove Swapfile.."
-fi
-   
-		read -p "Press enter to continue"
- exec bash
-fi
-
-#End Swapfile
-
-
-
 #Specify settings
 echo "Which port do you want to use for SHH?"
 read -r selport
@@ -206,7 +170,7 @@ if [ "$pm" = "nala" ] ; then
 	sudo apt install nala -y
 fi
 sleep 1
-sudo $pm install mc curl apt-transport-https ntp nano software-properties-common -y
+sudo $pm install mc curl apt-transport-https nano software-properties-common -y
 
 #Create swapfile
 echo "Create swapfile"
@@ -272,25 +236,6 @@ fi
 }
 #END Set swapiness
 
-#Remove swapiness
- 
-function rmswness() {
-read -p "Press enter to continue"
-varsw=$(cat /proc/sys/vm/swappiness)
-      read -p $'\033[1;32mPress enter to continue to remove custom swapiness'$'\e[0m'     
-      echo
-      echo -e "${BLUE}Removing Swapiness $varsw...${ENDCOLOR}" ;
-      echo
-      sed -i 's/vm.swappiness = '$varsw'/ /g' /etc/sysctl.conf
-      sudo sysctl -p  
-      sleep 2
-      echo
-      echo "Removed"
-      }
-
-
-#END Remove swapiness
-
 #check Swapiness excist
 if [ $(grep -ic "60" /proc/sys/vm/swappiness) -eq 1 ]; then
     echo -e "${RED}We have found custom swap.${ENDCOLOR}"
@@ -305,7 +250,37 @@ fi
 #END check Swapiness excist
 
 # set time
+
+sudo apt-get install ntp -y
 sleep 1
+sudo ufw allow 123/udp
+sleep 1
+echo ""
+echo "create conf file..."
+touch /etc/ntp.conf
+sleep 1
+
+cat > /etc/ntp.conf << EOF
+server 0.pool.ntp.org
+server 1.pool.ntp.org
+server 2.pool.ntp.org
+server 3.pool.ntp.org
+EOF
+
+sleep 1
+echo ""
+echo "Done..."
+sleep 1
+
+sudo systemctl restart ntp
+sleep 1
+sudo systemctl status ntp
+sleep 1
+echo ""
+echo "Check Sync..."
+ntpq -p 
+
+
 echo
 echo "Convert time to Dutch.."
 timedatectl set-timezone "Europe/Amsterdam"
