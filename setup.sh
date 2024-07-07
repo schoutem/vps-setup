@@ -41,12 +41,6 @@ fi
 }
 #End Check Linux Dist
 
-echo
-echo "This script works best on Ubuntu OS"
-echo "check..."
-echo
-progress_bar 5
-
 #Check Linux Dist
 check_os() {
 
@@ -96,6 +90,13 @@ __      _______   _____    _____      _
 
 check_root
 sleep 2
+echo
+echo "This script works best on Ubuntu OS"
+echo "check..."
+echo
+
+progress_bar 5
+
 check_os
 
 ##################################################################################################            
