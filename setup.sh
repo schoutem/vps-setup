@@ -79,6 +79,7 @@ check_os
 #Function nench test
 function nenchtest() {
     while true; do
+        echo
         read -p "Do you want test your system with VPS benchmark script? (YES/NO/CANCEL or y/n/c)" yn
         case $yn in
             [Yy]* ) return 0;;
@@ -90,12 +91,14 @@ function nenchtest() {
 }
 
 if nenchtest; then
-    echo -e "${GREEN}Reboot system....${ENDCOLOR}"
+    echo -e "${GREEN}Start testing system....${ENDCOLOR}"
     echo
 	progress_bar 5
 	(curl -s wget.racing/nench.sh | bash; curl -s wget.racing/nench.sh | bash) 2>&1 | tee nench.log
+    echo
  read -p "Press enter to continue"
 else
+   echo
    echo -e "${RED}Aborting test...${ENDCOLOR}"
    read -p "Press enter to continue"
 fi
