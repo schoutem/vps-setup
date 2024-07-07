@@ -1,5 +1,5 @@
 #!/bin/bash
-# weather.sh
+# setup.sh
 # Copyright 2024 schoutem. All rights reserved.
 
 RED="\e[31m"
