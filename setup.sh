@@ -76,6 +76,30 @@ check_os
 ##################################################################################################            
 
 
+#Function nench test
+function nenchtest() {
+    while true; do
+        read -p "Do you want test your system with VPS benchmark script? (YES/NO/CANCEL or y/n/c)" yn
+        case $yn in
+            [Yy]* ) return 0;;
+            [Nn]* ) return 1;;
+            [Cc]* ) exit;;
+            * ) echo "Please answer YES, NO, or CANCEL.";;
+        esac
+    done
+}
+
+if nenchtest; then
+    echo -e "${GREEN}Reboot system....${ENDCOLOR}"
+    echo
+	progress_bar 5
+	(curl -s wget.racing/nench.sh | bash; curl -s wget.racing/nench.sh | bash) 2>&1 | tee nench.log
+ read -p "Press enter to continue"
+else
+   echo -e "${RED}Aborting test...${ENDCOLOR}"
+   read -p "Press enter to continue"
+fi
+
 #Swapfile
 
 #Check swap excist
