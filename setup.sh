@@ -181,6 +181,8 @@ done
 #read -p ntp
 
 echo "Your settings are: port $selport, packetmanager $pm, Timezone $tz, NTP server $ntp"
+echo
+read -p "Press enter to continue"
 
 sleep 2
 echo
