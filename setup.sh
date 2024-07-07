@@ -158,7 +158,29 @@ select pm in "apt" "nala"; do
 done
 #read -p pm
 
-echo "Your settings are: port $selport and the chosen packetmanager $pm"
+#Choose TimeZone
+PS3="Choose your timezone (NL or Custom select): "
+echo 
+select tz in "NL" "Select custom timezone"; do
+  echo
+  echo "Choosen manager ${tz}"
+  echo
+  break
+done
+#read -p tz
+
+#Choose Pool NTP server
+PS3="Choose your NTP server your nearest geo location (NL or Custom select): "
+echo 
+select ntp in "NL" "Select custom NTP"; do
+  echo
+  echo "Choosen manager ${ntp}"
+  echo
+  break
+done
+#read -p ntp
+
+echo "Your settings are: port $selport, packetmanager $pm, Timezone $tz, NTP server $ntp"
 
 sleep 2
 echo
@@ -290,17 +312,33 @@ echo "create conf file..."
 touch /etc/ntp.conf
 sleep 1
 
-cat > /etc/ntp.conf << EOF
+#NTP server set
+if [[ $ntp == NL ]]
+then
+  echo
+  echo "Set pool NL in ntp.conf..."
+  sleep 1
+  cat > /etc/ntp.conf << EOF
+server 0.nl.pool.ntp.org
+server 1.nl.pool.ntp.org
+server 2.nl.pool.ntp.org
+server 3.nl.pool.ntp.org
+EOF
+  echo
+  echo "Done.."
+else
+  echo
+  echo "Setting default NTP (pool.ntp.org)..."
+  sleep 1
+  cat > /etc/ntp.conf << EOF
 server 0.pool.ntp.org
 server 1.pool.ntp.org
 server 2.pool.ntp.org
 server 3.pool.ntp.org
 EOF
-
-sleep 1
-echo ""
-echo "Done..."
-sleep 1
+  echo
+  echo "Done.."
+fi
 
 sudo systemctl restart ntp
 sleep 1
@@ -311,9 +349,24 @@ echo "Check Sync..."
 ntpq -p 
 
 
-echo
-echo "Convert time to Dutch.."
-timedatectl set-timezone "Europe/Amsterdam"
+#Timezone set
+if [[ $tz == NL ]]
+then
+  echo
+  echo "Set NL timezone..."
+  sleep 1
+  timedatectl set-timezone "Europe/Amsterdam"
+  echo
+  echo "Done.."
+else
+  echo
+  echo "Starting reconfigure tzdata"
+  sleep 
+  sudo dpkg-reconfigure tzdata
+  echo
+  echo "Done.."
+fi
+
 sleep 1
 echo ""
 echo "Check..."
