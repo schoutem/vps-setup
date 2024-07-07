@@ -1,4 +1,6 @@
 #!/bin/bash
+# weather.sh
+# Copyright 2024 schoutem. All rights reserved.
 
 RED="\e[31m"
 GREEN="\e[32m"
