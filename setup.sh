@@ -243,7 +243,7 @@ echo "Ok here we go...."
 
 # update and upgrade
 echo "Update and upgrade your system..."
-sleep 1
+progress_bar 5
 sudo apt update -y
 sudo apt upgrade -y
 
@@ -278,7 +278,7 @@ echo
 #Create swapfile
 echo "Create swapfile"
 create_swap "$swap_size"
-sleep 1
+progress_bar 5
 echo "Done..."
 echo
 # output results to terminal
@@ -360,6 +360,7 @@ sudo ufw allow 123/udp
 sleep 1
 echo ""
 echo "create conf file..."
+progress_bar 5
 touch /etc/ntp.conf
 sleep 1
 
@@ -368,7 +369,7 @@ if [[ $ntp == NL ]]
 then
   echo
   echo "Set pool NL in ntp.conf..."
-  sleep 1
+  progress_bar 5
   cat > /etc/ntp.conf << EOF
 server 0.nl.pool.ntp.org
 server 1.nl.pool.ntp.org
@@ -380,7 +381,7 @@ EOF
 else
   echo
   echo "Setting default NTP (pool.ntp.org)..."
-  sleep 1
+  progress_bar 5
   cat > /etc/ntp.conf << EOF
 server 0.pool.ntp.org
 server 1.pool.ntp.org
@@ -391,12 +392,17 @@ EOF
   echo "Done.."
 fi
 
+echo "restart NTP"
+progress_bar 5
 sudo systemctl restart ntp
 sleep 1
+echo "Status.."
+echo
 sudo systemctl status ntp
 sleep 1
-echo ""
+echo
 echo "Check Sync..."
+progress_bar 5
 ntpq -p 
 
 
@@ -441,18 +447,18 @@ sed -i -e '/^\(#\|\)AuthorizedKeysFile/s/^.*$/AuthorizedKeysFile .ssh\/authorize
 sleep 1
 echo
 echo "Restart SSH..."
-sleep 1
+progress_bar 5
 sudo sshd -t
 
 sudo systemctl restart ssh
 echo
 echo "Ready installing, SHH port is set to $selport and choosen packetmanager is $pm"
-sleep 1
+progress_bar 5
 
 echo
-sleep 1
 echo "Setting auto updates..."
 echo
+progress_bar 5
 
 #auto updates
 sudo apt install unattended-upgrades -y && sudo apt install update-notifier-common -y
@@ -485,16 +491,21 @@ sudo dpkg-reconfigure -plow unattended-upgrades
 sleep 1
 echo
 echo "service unattended restart..."
+progress_bar 5
 sudo systemctl restart unattended-upgrades.service
 sleep 1
 
 #status Unatended
+echo
+echo "Status test...."
+progress_bar 5
 systemctl status unattended-upgrades
 
 sleep 1
 echo
 echo "Test it Out with a Dry Run..."
 echo
+progress_bar 5
 sudo unattended-upgrades --dry-run --debug
 
 echo
