@@ -220,7 +220,7 @@ echo "Ok here we go...."
 ##############################################################################################
 
 # update and upgrade
-echo "Update and upgrade"
+echo "Update and upgrade your system..."
 sleep 1
 sudo apt update -y
 sudo apt upgrade -y
