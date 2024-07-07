@@ -47,7 +47,7 @@ echo
 progress_bar 5
 
 #Check Linux Dist
-
+check_os() {
 DISTREL="Ubuntu"
 DISTVERSION="24"
 
@@ -76,6 +76,7 @@ else
         exit
     fi
 fi
+}
 #End Check Linux Dist
 
 ##################################################################################################
