@@ -4,11 +4,14 @@
 
 ### VPS Setup
 
+This script will install and configure your VPS with the settings below in 1 click
+
 This script has been tested on Ubuntu version 22 and higher.
 
 > [!WARNING]
 > You must first set and Generating an SSH key (will be implemented soon)
 
+- Test with nench script https://github.com/n-st/nench
 - Update and Upgrade system latest packages<br />
 - Set swap and size<br />
 Set SHH port to your choice<br />
@@ -35,6 +38,10 @@ Set SHH port to your choice<br />
 - 20 auto-upgrades<br />
   - Periodic::Update-Package-Lists<br />
   - Periodic::Unattended-Upgrade<br />
+
+  ToDo:
+
+  - [ ] Autoconfig SHH key
 
 
 Install:
