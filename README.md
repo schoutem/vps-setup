@@ -2,35 +2,39 @@
 
 <img src="setup.png">
 
+### VPS Setup
 
 This script has been tested on Ubuntu version 22 and higher.
 
-Update and Upgrade system latest packages
-Set swap and size
-Set SHH port to your choice
-Config SHH:
-	PermitRootLogin prohibit-password
-	Port
-	PasswordAuthentication no
-	MaxAuthTries 2
-	KbdInteractiveAuthentication no
-	ChallengeResponseAuthentication no
-X11Forwarding no
-AuthorizedKeysFile .ssh authorized_keys
-Timezone set
-Instal and config NTP server
-Nano set: set constantshow, set linenumbers, set mouse
-Install unattended-upgrades and config:
-Unattended-Upgrade::AutoFixInterruptedDpkg
-Unattended-Upgrade::Remove-Unused-Kernel-Packages
-Unattended-Upgrade::Remove-New-Unused-Dependencies
-Unattended-Upgrade::Remove-Unused-Dependencies
-Unattended-Upgrade::Remove-New-Unused-Dependencies
-Unattended-Upgrade::Automatic-Reboot
-Unattended-Upgrade::Automatic-Reboot-Time
-20 auto-upgrades
-Periodic::Update-Package-Lists
-Periodic::Unattended-Upgrade
+> [!WARNING]
+> You must first set and Generating an SSH key (will be implemented soon)
+
+- Update and Upgrade system latest packages<br />
+- Set swap and size<br />
+Set SHH port to your choice<br />
+- Config SHH:<br />
+  - PermitRootLogin prohibit-password<br />
+  - Port<br />
+  - PasswordAuthentication no<br />
+  - MaxAuthTries 2<br />
+  - KbdInteractiveAuthentication no<br />
+  - ChallengeResponseAuthentication no<br />
+  - X11Forwarding no<br />
+- AuthorizedKeysFile .ssh authorized_keys<br />
+- Timezone set<br />
+- Instal and config NTP server<br />
+- Nano set: set constantshow, set linenumbers, set mouse<br />
+- Install unattended-upgrades and config:<br />
+  - Unattended-Upgrade::AutoFixInterruptedDpkg<br />
+  - Unattended-Upgrade::Remove-Unused-Kernel-Packages<br />
+  - Unattended-Upgrade::Remove-New-Unused-Dependencies<br />
+  - Unattended-Upgrade::Remove-Unused-Dependencies<br />
+  - Unattended-Upgrade::Remove-New-Unused-Dependencies<br />
+  - Unattended-Upgrade::Automatic-Reboot<br />
+  - Unattended-Upgrade::Automatic-Reboot-Time<br />
+- 20 auto-upgrades<br />
+  - Periodic::Update-Package-Lists<br />
+  - Periodic::Unattended-Upgrade<br />
 
 
 Install:
