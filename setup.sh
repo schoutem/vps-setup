@@ -25,6 +25,7 @@ progress_bar() {
   clean_line
 }
 
+#Check Linux Dist
 check_root() {
 echo "Check root..."
 sleep 2
@@ -38,7 +39,7 @@ if [ "$(id -u)" != "0" ]; then
   echo
 fi
 }
-
+#End Check Linux Dist
 
 echo
 echo "This script works best on Ubuntu OS"
