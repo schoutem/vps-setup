@@ -173,7 +173,7 @@ total_memory=$(grep MemTotal /proc/meminfo | awk '{print $2 * 1024}')
 echo "Choose an option:"
 echo "1. Double the system memory"
 echo "2. Set custom size (in GB)"
-echo "3. Exit"
+echo "3. None"
  
 read -p "Enter your choice (1/2/3): " choice
  
@@ -189,8 +189,7 @@ case $choice in
     ;;
   3)
     echo "Exiting..."
-    goto specset
-    ;;
+     ;;
   *)
     echo "Invalid option, exiting..."
     exit 1
@@ -199,7 +198,6 @@ esac
 #End setting swapfile
  	
 #Specify settings
-:specset
 echo "Which port do you want to use for SHH?"
 read -r selport
 echo "Entered port: $selport"
@@ -309,7 +307,7 @@ else
 echo "Choose an option:"
 echo "1. Set Swapiness to 10"
 echo "2. Set custom size (10-40)"
-echo "3. Exit"
+echo "3. None"
  
 read -p "Enter your choice (1/2/3): " choice
 
@@ -323,7 +321,6 @@ case $choice in
     ;;
   3)
     echo "Exiting..."
-    goto settime
     ;;
   *)
     echo "Invalid option, exiting..."
