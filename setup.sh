@@ -189,7 +189,7 @@ case $choice in
     ;;
   3)
     echo "Exiting..."
-    goto "specset"
+    goto specset
     ;;
   *)
     echo "Invalid option, exiting..."
@@ -323,7 +323,7 @@ case $choice in
     ;;
   3)
     echo "Exiting..."
-    goto "settime"
+    goto settime
     ;;
   *)
     echo "Invalid option, exiting..."
