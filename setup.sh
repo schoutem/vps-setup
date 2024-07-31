@@ -357,7 +357,6 @@ fi
 #END check Swapiness excist
 
 # set time
-:settime
 sudo apt-get install ntp -y
 sleep 1
 sudo ufw allow 123/udp
