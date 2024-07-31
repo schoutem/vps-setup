@@ -189,7 +189,7 @@ case $choice in
     ;;
   3)
     echo "Exiting..."
-    exit 0
+    goto "specset"
     ;;
   *)
     echo "Invalid option, exiting..."
@@ -199,6 +199,7 @@ esac
 #End setting swapfile
  	
 #Specify settings
+:specset
 echo "Which port do you want to use for SHH?"
 read -r selport
 echo "Entered port: $selport"
@@ -322,7 +323,7 @@ case $choice in
     ;;
   3)
     echo "Exiting..."
-    exit 0
+    goto "settime"
     ;;
   *)
     echo "Invalid option, exiting..."
@@ -359,7 +360,7 @@ fi
 #END check Swapiness excist
 
 # set time
-
+:settime
 sudo apt-get install ntp -y
 sleep 1
 sudo ufw allow 123/udp
