@@ -43,68 +43,9 @@ fi
 }
 #End Check Linux Dist
 
-#Check Linux Dist
-check_os() {
-
-DISTREL="Ubuntu"
-DISTVERSION="22"
-
-source /etc/lsb-release
-
-if [ -z $DISTRIB_RELEASE ] || [ -z $DISTRIB_ID ]; then
-    echo "DISTRIB_RELEASE and DISTRIB_ID are not set"
-else
-    if [ $DISTRIB_ID == "$DISTREL" ]; then
-        IFS='.' read -r -a distro_vers <<< $DISTRIB_RELEASE
-        major_ver=${distro_vers[0]}
-        echo "Distro major version $major_ver"
-        if [ -z $major_ver ]; then
-            echo "Major release version parsing failed"
-        else
-            if [ $(($major_ver)) -ge $DISTVERSION ]; then
-               echo -e "${GREEN}Ubuntu major version is greater than $DISTVERSION, ok!${ENDCOLOR}";
-                # do your operation here
-            else
-                echo -e "${RED}Ubuntu major version is lesser than $DISTVERSION, ok!${ENDCOLOR}";
-                exit
-            fi
-        fi
-    else
-        echo -e "${RED}It is not a Ubuntu Linux but a $DISTREL linux${ENDCOLOR}";
-        exit
-    fi
-fi
-}
-#End Check Linux Dist
-
-##################################################################################################
-
-echo -e "
-__      _______   _____    _____      _               
-\ \    / /  __ \ / ____|  / ____|    | |              
- \ \  / /| |__) | (___   | (___   ___| |_ _   _ _ __  
-  \ \/ / |  ___/ \___ \   \___ \ / _ \ __| | | | '_ \ 
-   \  /  | |     ____) |  ____) |  __/ |_| |_| | |_) |
-    \/   |_|    |_____/  |_____/ \___|\__|\__,_| .__/ 
-                                               | |    
-                                               |_|    
-" 
-
-check_root
-sleep 2
-echo
-echo "This script works best on Ubuntu OS"
-echo "check..."
-echo
-
-progress_bar 5
-
-check_os
-
-##################################################################################################            
-
 
 #Function nench test
+ntest () {
 function nenchtest() {
     while true; do
         echo
@@ -130,6 +71,45 @@ else
    echo -e "${RED}Aborting test...${ENDCOLOR}"
    read -p "Press enter to continue"
 fi
+}
+
+#Check Linux Dist
+
+check_os()
+{
+hostnamectl
+}
+
+
+#End Check Linux Dist
+
+##################################################################################################
+
+echo -e "
+__      _______   _____    _____      _               
+\ \    / /  __ \ / ____|  / ____|    | |              
+ \ \  / /| |__) | (___   | (___   ___| |_ _   _ _ __  
+  \ \/ / |  ___/ \___ \   \___ \ / _ \ __| | | | '_ \ 
+   \  /  | |     ____) |  ____) |  __/ |_| |_| | |_) |
+    \/   |_|    |_____/  |_____/ \___|\__|\__,_| .__/ 
+                                               | |    
+                                               |_|    
+" 
+
+check_root
+sleep 2
+echo
+echo "This script works best on Ubuntu/Debian OS"
+echo "check..."
+echo
+
+progress_bar 5
+
+check_os
+
+##################################################################################################            
+
+ntest
 
 #Swapfile
 
@@ -153,19 +133,19 @@ total_memory=$(grep MemTotal /proc/meminfo | awk '{print $2 * 1024}')
   local swapfile="/swapfile"
  
   # Create swap file with the specified size
-  sudo fallocate -l "$size" "$swapfile"
+   fallocate -l "$size" "$swapfile"
  
   # Set permissions
-  sudo chmod 600 "$swapfile"
+   chmod 600 "$swapfile"
  
   # Make it a swap file
-  sudo mkswap "$swapfile"
+   mkswap "$swapfile"
  
   # Enable swap
-  sudo swapon "$swapfile"
+   swapon "$swapfile"
  
   # Add swap file to /etc/fstab for auto-mount
-  echo "$swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+  echo "$swapfile none swap sw 0 0" | tee -a /etc/fstab
  
   echo "Swap file created and enabled successfully."
 }
@@ -212,29 +192,8 @@ select pm in "apt" "nala"; do
 done
 #read -p pm
 
-#Choose TimeZone
-PS3="Choose your timezone (NL or Custom select): "
-echo 
-select tz in "NL" "Select custom timezone"; do
-  echo
-  echo "Choosen manager ${tz}"
-  echo
-  break
-done
-#read -p tz
 
-#Choose Pool NTP server
-PS3="Choose your NTP server your nearest geo location (NL or Custom select): "
-echo 
-select ntp in "NL" "Select custom NTP"; do
-  echo
-  echo "Choosen manager ${ntp}"
-  echo
-  break
-done
-#read -p ntp
-
-echo "Your settings are: port $selport, packetmanager $pm, Timezone $tz, NTP server $ntp"
+echo "Your settings are: port $selport, packetmanager $pm"
 echo
 read -p "Press enter to continue"
 
@@ -249,8 +208,8 @@ echo "Ok here we go...."
 # update and upgrade
 echo "Update and upgrade your system..."
 progress_bar 5
-sudo apt update -y
-sudo apt upgrade -y
+apt update -y
+apt upgrade -y
 
 # install software
 echo
@@ -258,10 +217,10 @@ echo "install packages"
 sleep 1
 if [ "$pm" = "nala" ] ; then
 	echo "Installing nala...."
-	sudo apt install nala -y
+	 apt install nala -y
 fi
 sleep 1
-sudo $pm install mc curl apt-transport-https nano software-properties-common -y
+ $pm install mc curl apt-transport-https nano software-properties-common -y
 
 #Set Nano settings
 sleep 1
@@ -333,7 +292,7 @@ esac
         echo
         sed -i -e '$a\'$'\n''vm.swappiness = '$swap_size'' /etc/sysctl.conf
         echo   
-        sudo sysctl -p    
+         sysctl -p    
         sleep 2
         echo -e "${GREEN}Swapiness settings are set to $swap_size....${ENDCOLOR}" ;
         echo
@@ -357,84 +316,32 @@ fi
 #END check Swapiness excist
 
 # set time
-sudo apt-get install ntp -y
+apt install systemd-timesyncd
 sleep 1
-sudo ufw allow 123/udp
-sleep 1
-echo ""
-echo "create conf file..."
+
+
+
 progress_bar 5
-touch /etc/ntp.conf
+
 sleep 1
 
 #NTP server set
-if [[ $ntp == NL ]]
-then
-  echo
-  echo "Set pool NL in ntp.conf..."
-  progress_bar 5
-  cat > /etc/ntp.conf << EOF
-server 0.nl.pool.ntp.org
-server 1.nl.pool.ntp.org
-server 2.nl.pool.ntp.org
-server 3.nl.pool.ntp.org
-EOF
-  echo
-  echo "Done.."
-else
-  echo
-  echo "Setting default NTP (pool.ntp.org)..."
-  progress_bar 5
-  cat > /etc/ntp.conf << EOF
-server 0.pool.ntp.org
-server 1.pool.ntp.org
-server 2.pool.ntp.org
-server 3.pool.ntp.org
-EOF
-  echo
-  echo "Done.."
-fi
-
-echo "restart NTP"
-progress_bar 5
-sudo systemctl restart ntp
-sleep 1
-echo "Status.."
+dpkg-reconfigure tzdata
 echo
-sudo systemctl status ntp
-sleep 1
-echo
-echo "Check Sync..."
+
 progress_bar 5
-ntpq -p 
 
-
-#Timezone set
-if [[ $tz == NL ]]
-then
-  echo
-  echo "Set NL timezone..."
-  sleep 1
-  timedatectl set-timezone "Europe/Amsterdam"
-  echo
-  echo "Done.."
-else
-  echo
-  echo "Starting reconfigure tzdata"
-  sleep 
-  sudo dpkg-reconfigure tzdata
-  echo
-  echo "Done.."
-fi
-
-sleep 1
 echo ""
 echo "Check..."
-sudo systemctl restart ntp
+timedatectl set-ntp true
 sleep 1
 echo ""
 echo "Status NTP Check..."
-sudo systemctl status ntpd
+echo
+
+progress_bar 5
+timedatectl
+
 sleep 1
 
 #set SSH
@@ -451,9 +358,9 @@ sleep 1
 echo
 echo "Restart SSH..."
 progress_bar 5
-sudo sshd -t
+ sshd -t
 
-sudo systemctl restart ssh
+ systemctl restart ssh
 echo
 echo "Ready installing, SHH port is set to $selport and choosen packetmanager is $pm"
 progress_bar 5
@@ -464,7 +371,7 @@ echo
 progress_bar 5
 
 #auto updates
-sudo apt install unattended-upgrades -y && sudo apt install update-notifier-common -y
+ apt install unattended-upgrades -y &&  apt install update-notifier-common -y
 
 #50auto-upgrades
 sed -i 's/\/\/	 "${distro_id}:${distro_codename}";/	 "${distro_id}:${distro_codename}";/g' /etc/apt/apt.conf.d/50unattended-upgrades
@@ -489,13 +396,13 @@ echo -e "${BLUE}Now we are going reconfigue unattended service, next step click 
 echo
 sleep 1
 read -p "Press enter to begin reconfigure..."
-sudo dpkg-reconfigure -plow unattended-upgrades
+ dpkg-reconfigure -plow unattended-upgrades
 
 sleep 1
 echo
 echo "service unattended restart..."
 progress_bar 5
-sudo systemctl restart unattended-upgrades.service
+ systemctl restart unattended-upgrades.service
 sleep 1
 
 #status Unatended
@@ -509,12 +416,57 @@ echo
 echo "Test it Out with a Dry Run..."
 echo
 progress_bar 5
-sudo unattended-upgrades --dry-run --debug
+unattended-upgrades --dry-run --debug
 
 echo
 echo "Ready install unattended-upgrades.."
 echo
 #End auto updates
+
+#Firewall set
+
+echo
+echo "Set firewall..."
+
+
+progress_bar 5	
+
+apt install ufw -y
+
+ufw disable
+sleep 1
+
+ufw default deny incoming
+sleep 1
+ufw default allow outgoing
+sleep 1
+ufw default deny outgoing
+
+
+sleep 1
+
+if [ -z "$selport" ];
+then
+ufw allow ssh
+else
+ufw allow $selport
+fi
+
+echo ""
+echo "Set UFW port 123 (NTP)..."
+ufw allow 123/udp
+
+ufw allow OpenSSH
+sleep 1
+sudo ufw allow 80
+sleep 1
+sudo ufw allow 443
+sleep 1
+ufw enable
+ufw status verbose
+echo
+echo "Set firewall done..."
+#End Firewall set
 
 #Function reboot
 function confirm() {
@@ -533,7 +485,7 @@ if confirm; then
     echo -e "${GREEN}Reboot system....${ENDCOLOR}"
     echo
 	progress_bar 5
-	sudo reboot
+	 reboot
 else
    echo -e "${RED}Aborting the reboot...${ENDCOLOR}"
 fi
