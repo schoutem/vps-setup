@@ -1,1 +1,71 @@
 
+#checkroot
+check_root() {
+echo "Check root..."
+sleep 2
+if [ "$(id -u)" != "0" ]; then
+  echo
+	echo -e "${RED}You must be root to execute the script. Exiting....${ENDCOLOR}"
+	exit 1
+ else
+ echo
+ 	echo -e "${GREEN}Yes you are root....${ENDCOLOR}"
+  echo
+fi
+}
+# End checkroot
+
+#Check Linux Dist
+check_os()
+{
+hostnamectl
+}
+#End Check Linux Dist
+
+
+#Function nench test
+nenchtest() {
+       echo -e "${GREEN}Start testing system....${ENDCOLOR}"
+    echo
+	progress_bar 5
+	(curl -s wget.racing/nench.sh | bash; curl -s wget.racing/nench.sh | bash) 2>&1 | tee nench.log
+    echo
+}
+#End nench test
+
+#swap
+swapset () {
+# does the swap file already exist?
+grep -q "swapfile" /etc/fstab
+
+# if not then create it
+if [ $? -ne 0 ]; then
+  echo 'swapfile not found. Adding swapfile.'
+  fallocate -l ${swapsize}M /swapfile
+  chmod 600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
+  echo '/swapfile none swap defaults 0 0' >> /etc/fstab
+  whiptail --msgbox "Swapfile is set to $swapsize" 10 100
+else
+  echo 'swapfile found. Removing swapfile.'
+	sed -i '/swapfile/d' /etc/fstab
+	echo "3" > /proc/sys/vm/drop_caches
+	swapoff -a
+	rm -f /swapfile
+ sleep 1
+ fallocate -l ${swapsize}M /swapfile
+  chmod 600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
+  echo '/swapfile none swap defaults 0 0' >> /etc/fstab
+  whiptail --msgbox "Swapfile is set to $swapsize" 10 100
+fi
+
+# output results to terminal
+df -h
+cat /proc/swaps
+cat /proc/meminfo | grep Swap
+
+}
+#end swap
