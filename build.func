@@ -1,0 +1,15 @@
+# This function sets various color variables using ANSI escape codes for formatting text in the terminal.
+color() {
+  YELLOW=$(echo "\033[33m")
+  BLUE=$(echo "\033[36m")
+  RED=$(echo "\033[01;31m")
+  BGN=$(echo "\033[4;92m")
+  GREEN=$(echo "\033[1;92m")
+  DGN=$(echo "\033[32m")
+  CL=$(echo "\033[m")
+  CM="${GN}✓${CL}"
+  CROSS="${RD}✗${CL}"
+  BFR="\\r\\033[K"
+  ENDCOLOR="\e[0m"
+  HOLD=" "
+}
