@@ -1,4 +1,3 @@
-
 #checkroot
 check_root() {
 echo "Check root..."
