@@ -58,20 +58,24 @@ echo -n " $percent%"
 printf "\r"
 }
 
-function moment () {
-
-function commands {
-sleep 1
-}
-
-pb 30 30 Waiting
-commands > /dev/null 2>&1
-pb 30 60 Waiting
-commands > /dev/null 2>&1
-pb 30 90 Waiting
-commands > /dev/null 2>&1
-pb 30 100 Waiting
-echo
+# Function to display the progress bar
+moment() {
+  local duration=${1}
+    
+  already_done() { for ((done=0; done<$1; done++)); do printf "#"; done }
+  remaining() { for ((remain=$1; remain<$duration; remain++)); do printf " "; done }
+  percentage() { printf "| %s%%" $(( (($1)*100)/($duration)*100/100 )); }
+  clean_line() { printf "\r"; }
+ 
+  for (( current_duration=1; current_duration<=$duration; current_duration++ )); do
+    already_done $current_duration
+    remaining $current_duration
+    percentage $current_duration
+    clean_line
+    sleep 1
+  done
+ 
+  clean_line
 }
 
 msg_ok() {
@@ -317,15 +321,14 @@ if [ -z "$swapsize" ]; then
   echo
 else
 echo   "Swapsize $swapsize set"
-
 fi
 
 if whiptail --yesno "Your settings: SSH port: $selport, Swapsize: $swapsize \n\nCancel setup, select No." 10 100; then
 msg_info "Start setup....."
-moment
+moment 6
 else
 echo "Cancel setup....."
-moment
+moment 6
   clear
   exit
 fi
@@ -355,7 +358,7 @@ setfirewall
 if whiptail --title "Reboot" --yesno "VPS Setup setup ready, required reboot system?" 10 100; then
 
 msg_ok "Roboot system ..."
-moment
+moment 6
 sshd -t
 sleep 1
 reboot
