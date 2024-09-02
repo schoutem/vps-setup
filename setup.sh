@@ -147,9 +147,11 @@ function checkapp () {
 apt-get install whiptail mc curl apt-transport-https nano software-properties-common systemd-timesyncd -y
 
 msg_info "Update and upgrading your system..."
-
+moment 6
 apt-get update && apt-get upgrade -y
 
+msg_info "clean your system..."
+moment 6
 apt clean && apt autoremove -y
    
    msg_ok "Done..."
