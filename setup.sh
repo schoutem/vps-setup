@@ -59,7 +59,7 @@ printf "\r"
 }
 
 # Function to display the progress bar
-moment() {
+function moment () {
   local duration=${1}
     
   already_done() { for ((done=0; done<$1; done++)); do printf "#"; done }
@@ -148,7 +148,9 @@ apt-get install whiptail mc curl apt-transport-https nano software-properties-co
 
 msg_info "Update and upgrading your system..."
 
-apt-get update &&  apt-get upgrade -y
+apt-get update && apt-get upgrade -y
+
+apt clean && apt autoremove -y
    
    msg_ok "Done..."
 }
