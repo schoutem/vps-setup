@@ -32,51 +32,7 @@ CROSS="${RED}X${CL}"
 
 set -e
 
-#Function to display the progress bar
-function pb {
-# Usage:
-# pb <length> <percentage> <title>
-#
-# Run a simple "echo" command any time to leave the progress bar
 
-declare -i length=$1
-declare -i percent=$2
-title=$3
-declare -i pop=length*percent/100
-declare -i empty=length-pop
-printf "$title ["
-for (( i=0; i<=pop; i++ ))
-do
-    printf "#"
-done
-for (( i=0; i<empty; i++ ))
-do
-    printf " "
-done
-printf "]"
-echo -n " $percent%"
-printf "\r"
-}
-
-# Function to display the progress bar
-function moment () {
-  local duration=${1}
-    
-  already_done() { for ((done=0; done<$1; done++)); do printf "#"; done }
-  remaining() { for ((remain=$1; remain<$duration; remain++)); do printf " "; done }
-  percentage() { printf "| %s%%" $(( (($1)*100)/($duration)*100/100 )); }
-  clean_line() { printf "\r"; }
- 
-  for (( current_duration=1; current_duration<=$duration; current_duration++ )); do
-    already_done $current_duration
-    remaining $current_duration
-    percentage $current_duration
-    clean_line
-    sleep 1
-  done
- 
-  clean_line
-}
 
 msg_ok() {
   printf "\e[?25h"
@@ -110,6 +66,7 @@ echo
 
 #checkroot
 function check_root() {
+
 echo "Check root..."
 sleep 2
 if [[ "$(id -u)" -ne 0 || $(ps -o comm= -p $PPID) == "sudo" ]]; then
@@ -144,36 +101,183 @@ function checkapp () {
 
  msg_ok "Installing required apps..."
   
-apt-get install whiptail mc curl apt-transport-https nano software-properties-common systemd-timesyncd -y
+apt-get install whiptail curl apt-transport-https nano software-properties-common systemd-timesyncd -y
 
 msg_info "Update and upgrading your system..."
-moment 6
+echo
+
 apt-get update && apt-get upgrade -y
 
 msg_info "clean your system..."
 echo
-moment 6
+
 apt clean && apt autoremove -y
 echo   
 msg_ok "Done..."
 }
 
 
-function swapset () {
-# does the swap file already exist?
-grep -q "swapfile" /etc/fstab
 
-# if not then create it
-if [ $? -ne 0 ]; then
-	echo 'swapfile not found. Adding swapfile.'
-	fallocate -l ${swapsize}M /swapfile
-	chmod 600 /swapfile
-	mkswap /swapfile
-	swapon /swapfile
-	echo '/swapfile none swap defaults 0 0' >> /etc/fstab
-else
-	echo 'swapfile found. No changes made.'
-fi
+
+#swap set
+
+removeSwap() {
+    msg_ok "Will remove swap and backup fstab."
+    echo ""
+
+    #get the date time to help the scripts
+    backupTime=$(date +%y-%m-%d--%H-%M-%S)
+
+    #get the swapfile name
+    swapSpace=$(swapon -s | tail -1 |  awk '{print $1}' | cut -d '/' -f 2)
+    #debug: echo $swapSpace
+
+    #turn off swapping
+    swapoff /$swapSpace
+
+    #make backup of fstab
+    cp /etc/fstab /etc/fstab.$backupTime
+    
+    #remove swap space entry from fstab
+    sed -i "/swap/d" /etc/fstab
+
+    #remove swapfile
+    rm -f "/$swapSpace"
+
+    echo ""
+    echo "--> Done"
+    echo ""
+}
+
+#spinner by: https://www.shellscript.sh/tips/spinner/
+setupSwapSpinner() {
+  spinner="/|\\-/|\\-"
+  while :
+  do
+    for i in `seq 0 7`
+    do
+      echo -n "${spinner:$i:1}"
+      echo -en "\010"
+      sleep 1
+    done
+  done
+}
+
+#identifies available ram, calculate swap file size and configure
+createSwap() {
+    msg_ok "Will create a swap and setup fstab."
+    echo ""
+
+    #get available physical ram
+    availMemMb=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+    #debug: echo $availMemMb
+    
+    #convert from kb to mb to gb
+    gb=$(awk "BEGIN {print $availMemMb/1024/1204}")
+    #debug: echo $gb
+    
+    #round the number to nearest gb
+    gb=$(echo $gb | awk '{print ($0-int($0)<0.499)?int($0):int($0)+1}')
+    #debug: echo $gb
+
+    msg_ok "-> Available Physical RAM: $gb Gb"
+    echo ""
+    if [ $gb -eq 0 ]; then
+        echo "Something went wrong! Memory cannot be 0!"
+        exit 1;
+    fi
+
+    if [ $gb -le 2 ]; then
+        echo "   Memory is less than or equal to 2 Gb"
+        let swapSizeGb=$gb*2
+        msg_ok "   -> Set swap size to $swapSizeGb Gb"
+    fi
+    if [ $gb -gt 2 -a $gb -lt 32 ]; then
+        msg_ok "   Memory is more than 2 Gb and less than to 32 Gb."
+        let swapSizeGb=4+$gb-2
+        msg_ok "   -> Set swap size to $swapSizeGb Gb."
+    fi
+    if [ $gb -gt 32 ]; then
+        msg_ok "   Memory is more than or equal to 32 Gb."
+        let swapSizeGb=$gb
+        msg_ok "   -> Set swap size to $swapSizeGb Gb."
+    fi
+    echo ""
+
+    msg_ok "Creating the swap file! This may take a few minutes."
+    echo ""
+
+    #implement swap file
+
+    #start the spinner:
+    setupSwapSpinner &
+    
+    #make a note of its Process ID (PID):
+    SPIN_PID=$!
+    
+    #kill the spinner on any signal, including our own exit.
+    trap "kill -9 $SPIN_PID" `seq 0 15`
+
+    #convert gb to mb to avoid error: dd-memory-exhausted-by-input-buffer-of-size-bytes
+    let mb=$gb*1024
+
+    #create swap file on root system and set file size to mb variable
+    msg_ok "-> Create swap file."
+    echo ""
+    dd if=/dev/zero of=/swapfile bs=1M count=$mb
+
+    #set read and write permissions
+    msg_ok "-> Set swap file permissions."
+    echo ""
+    chmod 600 /swapfile
+
+    #create swap area
+    msg_ok "-> Create swap area."
+    echo ""
+    mkswap /swapfile
+
+    #enable swap file for use
+    echo "-> Turn on swap."
+    echo ""
+    swapon /swapfile
+
+    echo ""
+
+    #update the fstab
+    if grep -q "swap" /etc/fstab; then
+        echo "-> The fstab contains a swap entry."
+        #do nothing
+    else
+        echo "-> The fstab does not contain a swap entry. Adding an entry."
+        echo "/swapfile swap swap defaults 0 0" >> /etc/fstab    
+    fi
+
+    echo ""
+    echo "--> Done"
+    echo ""
+
+}
+
+#the main function that is run by the calling script.
+function setupSwapMain() {
+    #check if swap is on
+    isSwapOn=$(swapon -s | tail -1)
+
+    if [[ "$isSwapOn" == "" ]]; then
+        msg_ok "No swap has been configured! Will create."
+        echo ""
+
+        createSwap
+    else
+        msg_ok "Swap has been configured. Will remove and then re-create the swap."
+        echo ""
+        
+        removeSwap
+        createSwap
+    fi
+
+    msg_ok "Setup swap complete! Check output to confirm everything is good."
+}
 
 # output results to terminal
 swapon --show
@@ -182,7 +286,7 @@ cat /proc/meminfo | grep Swap
 
 msg_ok "Swapsize set done..."
 
-}
+
 #end swap
 
 function nanoset () {
@@ -312,33 +416,28 @@ echo "Cancel Benchmark test, start setup settings....."
 sleep 2
 fi
 
+
+
 selport=$(whiptail --inputbox "Please enter your SSH port (example: 223 or 2355)" 10 100 3>&1 1>&2 2>&3)
 
-swapsize=$(whiptail --title "Swapfile set" --menu "Choose an option" 18 100 10 \
-  "512" "set to 512 MB size." \
-  "1024" "set to 1024 MB size." \
-  "2048" "set to 2048 MB size." \
-  "4096" "set to 4096 MB size." \
-  "6144" "set to 6144 MB size." 3>&1 1>&2 2>&3)
+if whiptail --title "Swapset" --yesno "Set Swap file? \n\nSet the swap size using the following guidelines:\n
+less than 2 Gb RAM = swap size: 2 x the amount of RAM\n
+more than 2 GB RAM = but less than 32 GB, swap size: 4 GB + (RAM = 2 GB)\n
+32 GB of RAM or more = swap size: 1 x the amount of RAM\n" 20 100; 
 
-if [ -z "$swapsize" ]; then
-  echo "No option was chosen (user hit Cancel)"
-  echo
+then
+
+setupSwapMain
+kill -9 $SPIN_PID
 else
-echo   "Swapsize $swapsize set"
+echo "Cancel Swapfiles set, start setup settings....."
+
+sleep 2
 fi
 
-if whiptail --yesno "Your settings: SSH port: $selport, Swapsize: $swapsize \n\nCancel setup, select No." 10 100; then
+if whiptail --yesno "Your settings: SSH port: $selport, Swapsize: auto \n\nCancel setup, select No." 10 100; then
 msg_info "Start setup....."
-moment 6
-else
-echo "Cancel setup....."
-moment 6
-  clear
-  exit
-fi
-
-swapset
+echo
 
 sleep 1
 
@@ -362,11 +461,21 @@ setfirewall
 
 if whiptail --title "Reboot" --yesno "VPS Setup setup ready, required reboot system?" 10 100; then
 
-msg_ok "Roboot system ..."
-moment 6
+msg_ok "Reboot system ..."
+
 sshd -t
 sleep 1
 reboot
 else
 cont
 fi
+
+
+else
+echo "Cancel setup....."
+
+echo
+  clear
+  exit
+fi
+
