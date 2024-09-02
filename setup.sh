@@ -151,10 +151,11 @@ moment 6
 apt-get update && apt-get upgrade -y
 
 msg_info "clean your system..."
+echo
 moment 6
 apt clean && apt autoremove -y
-   
-   msg_ok "Done..."
+echo   
+msg_ok "Done..."
 }
 
 
