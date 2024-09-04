@@ -32,14 +32,11 @@ CROSS="${RED}X${CL}"
 
 set -e
 
-
-
 msg_ok() {
   printf "\e[?25h"
   local msg="$1"
   echo
-  echo -e "${BFR} ${CM} ${GN}${msg}${CL}"
-  echo
+  echo -e "${BFR} ${CM} ${GN}${msg}${CL}\n\n"
 }
 
 # This function displays a error message with a red color.
@@ -47,14 +44,13 @@ msg_error() {
   printf "\e[?25h"
   local msg="$1"
   echo
-  echo -e "${BFR} ${CROSS} ${RD}${msg}${CL}"
-  echo
+  echo -e "${BFR} ${CROSS} ${RD}${msg}${CL}\n\n"
 }
 
 # This function displays an informational message with a yellow color.
 msg_info() {
   local msg="$1"
-  echo -ne " ${HOLD} ${YW}${msg}${CL}"
+  echo -ne " ${HOLD} ${YW}${msg}${CL}\n\n"
 }
 
 # This function displays continue
@@ -64,11 +60,23 @@ read -p " Press enter to continue..."
 echo
 }
 
+function waiting() {
+sleep 2 & PID=$! #simulate process
+
+printf "\n["
+# While process is running...
+while kill -0 $PID 2> /dev/null; do 
+    printf  "¦"
+    sleep 0.08
+done
+printf "]\n\n"
+}
+
 #checkroot
 function check_root() {
 
 echo "Check root..."
-sleep 2
+waiting
 if [[ "$(id -u)" -ne 0 || $(ps -o comm= -p $PPID) == "sudo" ]]; then
   msg_error "You must be root to execute the script. Exiting...."
 	exit 1
@@ -79,7 +87,6 @@ msg_ok "Yes you are root...."
 fi
 }
 # End checkroot
-
 
 function check_os()
 {
@@ -99,9 +106,9 @@ echo -e  "${BFR} ${CM} ${GN}Start testing system....${CL}"
 
 function checkapp () {
 
- msg_ok "Installing required apps..."
+msg_ok "Installing required apps..."
   
-apt-get install whiptail curl apt-transport-https nano software-properties-common systemd-timesyncd -y
+apt-get install curl apt-transport-https nano software-properties-common systemd-timesyncd -y
 
 msg_info "Update and upgrading your system..."
 echo
@@ -116,39 +123,7 @@ echo
 msg_ok "Done..."
 }
 
-
-
-
 #swap set
-
-removeSwap() {
-    msg_ok "Will remove swap and backup fstab."
-    echo ""
-
-    #get the date time to help the scripts
-    backupTime=$(date +%y-%m-%d--%H-%M-%S)
-
-    #get the swapfile name
-    swapSpace=$(swapon -s | tail -1 |  awk '{print $1}' | cut -d '/' -f 2)
-    #debug: echo $swapSpace
-
-    #turn off swapping
-    swapoff /$swapSpace
-
-    #make backup of fstab
-    cp /etc/fstab /etc/fstab.$backupTime
-    
-    #remove swap space entry from fstab
-    sed -i "/swap/d" /etc/fstab
-
-    #remove swapfile
-    rm -f "/$swapSpace"
-
-    echo ""
-    echo "--> Done"
-    echo ""
-}
-
 #spinner by: https://www.shellscript.sh/tips/spinner/
 setupSwapSpinner() {
   spinner="/|\\-/|\\-"
@@ -272,8 +247,7 @@ function setupSwapMain() {
         msg_ok "Swap has been configured. Will remove and then re-create the swap."
         echo ""
         
-        removeSwap
-        createSwap
+         createSwap
     fi
 
     msg_ok "Setup swap complete! Check output to confirm everything is good."
@@ -295,7 +269,6 @@ sed -i -e '/^\(#\|\) set constantshow/s/^.*$/set constantshow/' /etc/nanorc
 sed -i -e '/^\(#\|\) set linenumbers/s/^.*$/set linenumbers/' /etc/nanorc
 sed -i -e '/^\(#\|\) set mouse/s/^.*$/set mouse/' /etc/nanorc
 msg_ok "Nano set done..."
-sleep 1
 }
 
 function timeset () {
@@ -316,8 +289,7 @@ sed -i -e '/^\(#\|\)KbdInteractiveAuthentication/s/^.*$/KbdInteractiveAuthentica
 sed -i -e '/^\(#\|\)ChallengeResponseAuthentication/s/^.*$/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
 sed -i -e '/^\(#\|\)X11Forwarding/s/^.*$/X11Forwarding no/' /etc/ssh/sshd_config
 sed -i -e '/^\(#\|\)AuthorizedKeysFile/s/^.*$/AuthorizedKeysFile .ssh\/authorized_keys/' /etc/ssh/sshd_config
-
-msg_ok "SSH config set done ..."
+  msg_ok "SSH config set done ..."
 }
 
 function autoupdate () {
@@ -344,9 +316,9 @@ sed -i 's/\/\/APT::Periodic::Unattended-Upgrade "0";/APT::Periodic::Unattended-U
 read -p "Press enter to begin reconfigure..."
  dpkg-reconfigure -plow unattended-upgrades
  
-sleep 1
+waiting
 echo
-echo "Test it Out with a Dry Run..."
+msg_ok "Test it Out with a Dry Run..."
 echo
 
 unattended-upgrades --dry-run --debug
@@ -377,7 +349,7 @@ ufw allow $selport
 fi
 
 echo ""
-echo "Set UFW port 123 (NTP)..."
+msg_ok "Set UFW port 123 (NTP)..."
 ufw allow 123/udp
 
 ufw allow OpenSSH
@@ -386,96 +358,140 @@ sudo ufw allow 80
 sleep 1
 sudo ufw allow 443
 sleep 1
-ufw enable
-ufw status verbose
+
 
 msg_ok "Firewall set done ..."
 sleep 1
 }
 
+function check() {
+   msg_ok "Config SHH and port set $selport"; sleep 1;
+   msg_ok "Swap set"; sleep 1;
+   msg_ok "Timezone set"; sleep 1;
+   msg_ok "Nano set"; sleep 1;
+   msg_ok "Install unattended-upgrades set"; sleep 1;
+   msg_ok "20 auto-upgrades set"; sleep 1;
+   msg_ok "Update and upgrades"; sleep 1;
+   msg_ok "Firewall set"; sleep 1;
+}
+
 #######################################################################################
 
 header_info
-sleep 1
+
 check_root
-sleep 1
 
 checkapp
 
 msg_ok "This script works best on Ubuntu/Debian OS"
 
 check_os
-
-if whiptail --title "Benchmark test" --yesno "Do you want test your system with VPS benchmark script? (https://github.com/n-st/nench)" 10 100; then
-
+echo -e "${BL}"
+read -p "Do you want test your system with VPS benchmark script? (https://github.com/n-st/nench)? (y)Yes/(n)No/(c)Cancel:- " nenchchoice
+echo -e "${CL}\n\n"
+case $nenchchoice in
+[yY]* ) msg_ok "Ok, we will proceed" 
+msg_info "starting test...."
+waiting
 nenchtest
+;;
+[nN]* ) msg_info "Cancel Benchmark test, start setup settings..." ;;
+[cC]* ) msg_error "Installation cancelled";
+waiting
+echo
+clear
+exit;;
+*) exit ;;
+esac
 
-else
-echo "Cancel Benchmark test, start setup settings....."
+selport="22"
+echo -e "${BL}"
+read -e -i "$selport" -p "Please enter your SSH port (example: 223 or 2355, enter for default 22) " input
+echo -e "${CL}\n\n"
+selport="${input:-$selport}"
 
-sleep 2
-fi
+msg_ok "-> Ok your selecting port is $selport"
+waiting
 
-
-
-selport=$(whiptail --inputbox "Please enter your SSH port (example: 223 or 2355)" 10 100 3>&1 1>&2 2>&3)
-
-if whiptail --title "Swapset" --yesno "Set Swap file? \n\nSet the swap size using the following guidelines:\n
-less than 2 Gb RAM = swap size: 2 x the amount of RAM\n
-more than 2 GB RAM = but less than 32 GB, swap size: 4 GB + (RAM = 2 GB)\n
-32 GB of RAM or more = swap size: 1 x the amount of RAM\n" 20 100; 
-
+if [[ $(swapon -s | grep -ci "/dev" ) -gt 0 ]] ;
 then
 
-setupSwapMain
-kill -9 $SPIN_PID
-else
-echo "Cancel Swapfiles set, start setup settings....."
-
-sleep 2
-fi
-
-if whiptail --yesno "Your settings: SSH port: $selport, Swapsize: auto \n\nCancel setup, select No." 10 100; then
-msg_info "Start setup....."
+echo
+msg_ok "-> Ok Swapfile found, no changes"
 echo
 
-sleep 1
+else 
+
+echo
+echo "Swapfile not found, create one?"
+echo "Set the swap size using the following guidelines:"
+echo
+echo "Less than 2 Gb RAM -> swap size: 2 x the amount of RAM"
+echo "More than 2 GB RAM -> but less than 32 GB, swap size: 4 GB + (RAM = 2 GB)"
+echo "32 GB of RAM or more -> swap size: 1 x the amount of RAM"
+echo
+
+echo -e "${BL}"
+read -p "Set Swap file? (y)Yes/(n)No/(c)Cancel:- " choice
+echo -e "${CL}\n\n"
+
+case $choice in
+[yY]* ) msg_ok "Ok,starting...." 
+setupSwapMain
+kill -9 $SPIN_PID
+;;
+[nN]* ) msg_info "Canceling no changes, proceed setup.." ;;
+[cC]* ) msg_error "Installation cancelled";
+exit;;
+*) exit ;;
+esac
+
+fi
+
+waiting
 
 nanoset
 
-sleep 1
+waiting
 
 timeset
 
-sleep 1
+waiting
 
 setssh
-
-sleep 1
+  
+waiting
 
 autoupdate
 
-sleep 1
+waiting
 
 setfirewall
 
-if whiptail --title "Reboot" --yesno "VPS Setup setup ready, required reboot system?" 10 100; then
+waiting
 
-msg_ok "Reboot system ..."
+check
 
+echo -e "${BL}"
+read -p "VPS Setup setup ready, required reboot system? (y)Yes/(n)No/(c)Cancel:- " rebootchoice
+echo -e "${CL}\n\n"
+
+# giving choices there tasks using
+case $rebootchoice in
+[yY]* ) msg_ok "Ok, we will proceed" 
+msg_info "Implement latest changes and reboot sytem...."
+waiting
 sshd -t
-sleep 1
+ufw enable
+ufw status verbose
+waiting
 reboot
-else
-cont
-fi
-
-
-else
-echo "Cancel setup....."
-
+;;
+[nN]* ) msg_info "Cancel..." ;;
+[cC]* ) msg_error "Installation cancelled";
+waiting
 echo
-  clear
-  exit
-fi
-
+clear
+exit;;
+*) exit ;;
+esac
