@@ -66,7 +66,7 @@ sleep 2 & PID=$! #simulate process
 printf "\n["
 # While process is running...
 while kill -0 $PID 2> /dev/null; do 
-    printf  "¦"
+    printf  "█"
     sleep 0.08
 done
 printf "]\n\n"
