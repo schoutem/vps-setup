@@ -124,8 +124,14 @@ echo -e  "${BFR} ${CM} ${GN}Start testing system....${CL}"
 function checkapp () {
 
 msg_ok "Installing required apps..."
-  
-apt-get install curl apt-transport-https nano software-properties-common systemd-timesyncd -y
+
+
+. /etc/os-release
+if [ "$ID" == "ubuntu" ]; then     
+apt-get install curl apt-transport-https nano software-properties-common systemd-timesyncd unattended-upgrades update-notifier-common -y
+else
+apt-get install curl apt-transport-https nano unattended-upgrades apt-listchanges -y
+fi
 
 msg_info "Update and upgrading your system..."
 echo
@@ -310,8 +316,6 @@ sed -i -e '/^\(#\|\)AuthorizedKeysFile/s/^.*$/AuthorizedKeysFile .ssh\/authorize
 }
 
 function autoupdate () {
-
-apt install unattended-upgrades update-notifier-common -y
 
 #50auto-upgrades
 sed -i 's/\/\/	 "${distro_id}:${distro_codename}";/	 "${distro_id}:${distro_codename}";/g' /etc/apt/apt.conf.d/50unattended-upgrades
