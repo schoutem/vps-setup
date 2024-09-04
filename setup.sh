@@ -180,14 +180,6 @@ function checkapp () {
 
 msg_ok "Installing required apps..."
 
-
-. /etc/os-release
-if [ "$ID" == "ubuntu" ]; then     
-apt-get install curl apt-transport-https nano software-properties-common systemd-timesyncd unattended-upgrades update-notifier-common -y
-else
-apt-get install curl apt-transport-https nano unattended-upgrades apt-listchanges -y
-fi
-
 msg_info "Update and upgrading your system..."
 echo
 
@@ -198,6 +190,13 @@ echo
 
 apt clean && apt autoremove -y
 echo   
+
+. /etc/os-release
+if [ "$ID" == "ubuntu" ]; then     
+apt-get install curl apt-transport-https nano software-properties-common systemd-timesyncd unattended-upgrades update-notifier-common -y
+else
+apt-get install curl apt-transport-https nano unattended-upgrades apt-listchanges -y
+fi
 msg_ok "Done..."
 }
 
