@@ -110,6 +110,61 @@ exit 1;
   fi
 }
 
+function sshceck() {
+echo -e "${RD}"
+echo "You must first set and Generating an SSH key!"
+echo
+read -p "Setup SHH key? (y)Yes/(n)No/(c)Cancel:- " keychoice
+echo -e "${CL}\n\n"
+
+case $keychoice in
+[yY]* ) msg_ok "Ok, we will proceed" 
+
+pubkey
+
+;;
+[nN]* ) msg_info "Cancel generating SSH key..." ;;
+[cC]* ) msg_error "Installation cancelled";
+waiting
+echo
+clear
+exit;;
+*) exit ;;
+esac
+}
+
+function pubkey() {
+
+DIR="$HOME/.ssh/"
+if [ -d "$DIR" ]; then
+  echo
+  echo "Check dir ${DIR} excist, setup ssh key..."
+  echo
+else
+  echo "Error: ${DIR} not found. Create .ssh folder...."
+  
+  mkdir -p $HOME/.ssh && sudo touch $HOME.ssh/authorized_keys
+  chmod 700 $HOME/.ssh && sudo chmod 600 $HOME/.ssh/authorized_keys
+  chown -R root:root $HOME/.ssh
+ 
+fi
+sleep 1
+ssh-keygen -t rsa
+sleep 1
+echo -e "${BL}"
+echo "Dowload your id_rsa file from folder .ssh to your desktop folder..."
+echo -e "${CL}\n\n"
+echo
+read -p " Press enter to copy your key to .ssh/authorized_keys..."
+
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+
+echo
+
+echo "Done....."
+}
+
+
 function nenchtest() {
 
 echo -e  "${BFR} ${CM} ${GN}Start testing system....${CL}"
@@ -407,6 +462,9 @@ checkapp
 msg_ok "This script works best on Ubuntu/Debian OS"
 
 check_os
+
+sshceck
+
 echo -e "${BL}"
 read -p "Do you want test your system with VPS benchmark script? (https://github.com/n-st/nench)? (y)Yes/(n)No/(c)Cancel:- " nenchchoice
 echo -e "${CL}\n\n"
