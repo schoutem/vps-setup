@@ -88,7 +88,7 @@ fi
 }
 # End checkroot
 
-function check_os(){
+function check_os() {
 . /etc/os-release
 if [ "$ID" == "ubuntu" ]; then   
   echo "Ubuntu detected" 
@@ -101,11 +101,11 @@ else
     hostnamectl
     else   
        echo "Unknown OS unsupported detected"
-       sleep 1
+       sleep 4
 echo
 echo "Cancel setup..."
 clear
-exit;
+exit 1;
     fi
   fi
 }
