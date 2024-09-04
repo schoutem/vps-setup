@@ -54,7 +54,7 @@ msg_info() {
 }
 
 # This function displays continue
-function cont {
+function cont() {
 echo
 read -p " Press enter to continue..."
 echo
@@ -100,7 +100,12 @@ else
     echo
     hostnamectl
     else   
-      echo "Unknown OS detected"
+       echo "Unknown OS unsupported detected"
+       sleep 1
+echo
+echo "Cancel setup..."
+clear
+exit;
     fi
   fi
 }
