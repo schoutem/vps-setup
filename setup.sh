@@ -88,9 +88,21 @@ fi
 }
 # End checkroot
 
-function check_os()
-{
-hostnamectl
+function check_os(){
+. /etc/os-release
+if [ "$ID" == "ubuntu" ]; then   
+  echo "Ubuntu detected" 
+  echo
+  hostnamectl
+else
+  if [ "$ID" == "debian" ]; then   
+    echo "debian Linux detected" 
+    echo
+    hostnamectl
+    else   
+      echo "Unknown OS detected"
+    fi
+  fi
 }
 
 function nenchtest() {
